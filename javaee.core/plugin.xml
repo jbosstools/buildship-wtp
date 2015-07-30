@@ -15,7 +15,7 @@
          point="org.eclipse.ui.handlers">
       <handler
             commandId="jbossgradle.ui.commands.refreshproject"
-            class="javaee.Handler">
+            class="javaee.core.Handler">
       </handler>
    </extension>
    
@@ -41,7 +41,7 @@
          locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
         <menu
           id="jbossgradle.ui.contextmenuentry"
-          label="Gradle">
+          label="Gradle Model">
         </menu>
        </menuContribution>
   </extension>

@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList.Builder;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
+ * 
  * @see org.eclipse.core.commands.IHandler
  * @see org.eclipse.core.commands.AbstractHandler
  */
@@ -38,30 +39,28 @@ public class Handler extends AbstractHandler {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 
 		List<IProject> projects = collectSelectedProjects(event);
-		
-		MessageDialog.openInformation(
-				window.getShell(),
-				"Jboss-gradle",
-				"..");
-		
+		Runner tar = new Runner();
+		MessageDialog.openInformation(window.getShell(), "Jboss-gradle",
+				tar.analyzeProject(projects.get(0).getLocation().toString()).toString());
+
 		return null;
 	}
-	
-    private List<IProject> collectSelectedProjects(ExecutionEvent event) {
-        ISelection currentSelection = HandlerUtil.getCurrentSelection(event);
-        Builder<IProject> result = ImmutableList.builder();
-        if (currentSelection instanceof IStructuredSelection) {
-            IStructuredSelection selection = (IStructuredSelection) currentSelection;
-            IAdapterManager adapterManager = Platform.getAdapterManager();
-            for (Object selectionItem : selection.toList()) {
-                @SuppressWarnings({"cast", "RedundantCast"})
-                IResource resource = (IResource) adapterManager.getAdapter(selectionItem, IResource.class);
-                if (resource != null) {
-                    IProject project = resource.getProject();
-                    result.add(project);
-                }
-            }
-        }
-        return result.build();
-    }
+
+	private List<IProject> collectSelectedProjects(ExecutionEvent event) {
+		ISelection currentSelection = HandlerUtil.getCurrentSelection(event);
+		Builder<IProject> result = ImmutableList.builder();
+		if (currentSelection instanceof IStructuredSelection) {
+			IStructuredSelection selection = (IStructuredSelection) currentSelection;
+			IAdapterManager adapterManager = Platform.getAdapterManager();
+			for (Object selectionItem : selection.toList()) {
+				@SuppressWarnings({ "cast", "RedundantCast" })
+				IResource resource = (IResource) adapterManager.getAdapter(selectionItem, IResource.class);
+				if (resource != null) {
+					IProject project = resource.getProject();
+					result.add(project);
+				}
+			}
+		}
+		return result.build();
+	}
 }
