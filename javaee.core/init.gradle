@@ -3,7 +3,7 @@
 initscript {
     repositories {
         flatDir {
-			dirs "REDHAT-PLUGIN"
+			dirs "/home/istewart/buildship-master11/eclipse/../../Development/javaee/javaee.core/repo/libs/redhat-plugin/1.0"
         }
     }
 
