@@ -1,0 +1,5 @@
+include ':javaee.core'
+include ':javaee.model'
+include ':javaee.site'
+include ':javaee.feature'
+include ':javaee.plugin'
