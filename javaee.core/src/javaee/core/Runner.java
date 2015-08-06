@@ -7,13 +7,12 @@ import java.util.List;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
-import javaee.model.WarModel;
 
 public class Runner {
 	/*
 	 * The path to the init.gradle file.
 	 */
-	private static final String INIT_FILE_PATH = "../../init.gradle";
+	private static final String INIT_FILE_PATH = Activator.getDefault().getStateLocation().append("init.gradle").toString();
 
 	/**
 	 * Analyzes the project located at projectPath.
@@ -28,6 +27,7 @@ public class Runner {
 		try {
 			connection = connector.connect();
 			WarModel model = getCustomModel(connection);
+			System.out.println("<< getCustomModel");
 			lis = analyzeWarProperties(model);
 		} finally {
 			closeConnection(connection);
@@ -43,6 +43,7 @@ public class Runner {
 
 	private static WarModel getCustomModel(ProjectConnection connection) {
 		ModelBuilder<WarModel> customModelBuilder = connection.model(WarModel.class);
+		System.out.println(">> getCustomModel");
 		customModelBuilder.withArguments("--init-script", INIT_FILE_PATH);
 		return customModelBuilder.get();
 	}

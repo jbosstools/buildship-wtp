@@ -1,5 +1,5 @@
 apply plugin: 'java'
 
 dependencies {
-	compile project(':javaee.model')
+	compile gradleApi()
 }

@@ -1,8 +1,8 @@
 {
   "1.0": {
-    "project_path": ":",
+    "project_path": ":javaee.plugin",
     "project_dir": "/home/istewart/Development/javaee/javaee.plugin",
-    "connection_project_dir": "/home/istewart/Development/javaee/javaee.plugin",
+    "connection_project_dir": "/home/istewart/Development/javaee",
     "connection_gradle_user_home": null,
     "connection_gradle_distribution": "GRADLE_DISTRIBUTION(WRAPPER)",
     "connection_java_home": null,

@@ -8,13 +8,12 @@ import org.gradle.api.Project;
 import org.gradle.api.UnknownTaskException;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
-import javaee.model.WarModel;
-import javaee.model.DefaultWarModel;
 
 public class JavaEEModelBuilder implements ToolingModelBuilder {
+
 	@Override
 	public boolean canBuild(String modelName) {
-		return modelName.equals(WarModel.class.getName());
+		return modelName.equals("javaee.core.WarModel");
 	}
 
 	@Override

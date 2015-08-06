@@ -1,1 +1,17 @@
-apply plugin: pluginBuild.JavaEEPlugin
+//initscript.directory = "/home/istewart/buildship-master11/runtime-EclipseApplication/.metadata/.plugins/javaee.core/repo"
+
+initscript {
+    repositories {
+        flatDir {
+			dirs "REDHAT-PLUGIN"
+        }
+    }
+
+    dependencies {
+        classpath ':redhat-plugin-1.0'
+    }
+}
+
+allprojects {
+    apply plugin: javaee.plugin.JavaEEPlugin
+}
