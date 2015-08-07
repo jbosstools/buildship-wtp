@@ -9,9 +9,7 @@ import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
 
 public class Runner {
-	/*
-	 * The path to the init.gradle file.
-	 */
+
 	private static final String INIT_FILE_PATH = Activator.getDefault().getStateLocation().append("init.gradle").toString();
 
 	/**
