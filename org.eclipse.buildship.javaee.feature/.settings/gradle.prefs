@@ -1,7 +1,7 @@
 {
   "1.0": {
-    "project_path": ":javaee.plugin",
-    "project_dir": "/home/istewart/Development/javaee/javaee.plugin",
+    "project_path": ":org.eclipse.buildship.javaee.feature",
+    "project_dir": "/home/istewart/Development/javaee/org.eclipse.buildship.javaee.feature",
     "connection_project_dir": "/home/istewart/Development/javaee",
     "connection_gradle_user_home": null,
     "connection_gradle_distribution": "GRADLE_DISTRIBUTION(WRAPPER)",

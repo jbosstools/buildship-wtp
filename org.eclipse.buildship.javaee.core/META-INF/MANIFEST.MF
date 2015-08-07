@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Core
-Bundle-SymbolicName: javaee.core;singleton:=true
+Bundle-SymbolicName: org.eclipse.buildship.javaee.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: javaee.core.Activator
 Require-Bundle: org.eclipse.ui,

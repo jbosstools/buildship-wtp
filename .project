@@ -16,7 +16,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1438803751682</id>
+			<id>0</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -25,7 +25,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1438803751683</id>
+			<id>0</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -34,7 +34,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1438803751683</id>
+			<id>0</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -43,7 +43,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1438803751684</id>
+			<id>0</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -52,7 +52,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1438803787856</id>
+			<id>0</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -61,7 +61,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1438803787858</id>
+			<id>0</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -70,12 +70,57 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1438873161351</id>
+			<id>0</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-projectRelativePath-matches-false-false-javaee.plugin</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1438958547749</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.core</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1438958547750</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.feature</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1438958547752</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.model</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1438958547755</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.plugin</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1438958547756</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.site</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>
