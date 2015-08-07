@@ -85,11 +85,6 @@ public class Activator extends AbstractUIPlugin {
 	        destFile.createNewFile();
 	    }
 	    
-	    if (!sourceFile.exists()) {
-	    	System.out.println("WHAT!");
-	    	System.out.println(sourceFile.getAbsolutePath());
-	    }
-
 	    FileChannel source = null;
 	    FileChannel destination = null;
 

@@ -27,7 +27,6 @@ public class Runner {
 		try {
 			connection = connector.connect();
 			WarModel model = getCustomModel(connection);
-			System.out.println("<< getCustomModel");
 			lis = analyzeWarProperties(model);
 		} finally {
 			closeConnection(connection);
@@ -43,7 +42,6 @@ public class Runner {
 
 	private static WarModel getCustomModel(ProjectConnection connection) {
 		ModelBuilder<WarModel> customModelBuilder = connection.model(WarModel.class);
-		System.out.println(">> getCustomModel");
 		customModelBuilder.withArguments("--init-script", INIT_FILE_PATH);
 		return customModelBuilder.get();
 	}
