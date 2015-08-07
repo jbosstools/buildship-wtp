@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="javaee.feature"
+      id="org.eclipse.javaee.feature"
       label="Feature"
-      version="1.0.0.qualifier">
+      version="1.0.0.qualifier"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0">
 
-   <description url="www.cs.toronto.edu/~iansb/javaee.site">
-      JavaEE-Gradle Integration Plugin for Eclipse
+   <description>
+      %description
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright>
+      %copyright
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
-   </license>
+   <license>
 
    <plugin
-         id="javaee.core"
+         id="org.eclipse.buildship.javaee.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
