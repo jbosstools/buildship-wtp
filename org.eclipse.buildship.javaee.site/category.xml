@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+<category-def name="Buildship-JavaEE" label="Buildship: Eclipse Plug-ins for Gradle" />
+    <feature id="javaee.feature"
+             url="features/javaee.feature_1.0.0.201508061642.jar"
+             version="0.0.0">
+    <category name="Buildship-JavaEE" />
+</feature>
+</site>
