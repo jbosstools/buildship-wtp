@@ -3,7 +3,7 @@
 initscript {
     repositories {
         flatDir {
-			dirs "REDHAT-PLUGIN"
+			dirs getStartParameter().getSystemPropertiesArgs().get('pluginDirectory')
         }
     }
 

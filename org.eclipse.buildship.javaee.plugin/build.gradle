@@ -12,7 +12,7 @@ apply plugin: 'java'
 
 archivesBaseName = 'redhat-plugin'
 version = '1.0'
-buildDir = '../javaee.core/repo'
+buildDir = '../org.eclipse.buildship.javaee.core/repo'
 
 // In this section you declare where to find the dependencies of your project
 repositories {

@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2015 the original author or authors.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
+ */
 package javaee.core;
 
 import java.io.File;
@@ -38,7 +48,7 @@ public class Activator extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        IPath metadataPath = plugin.getStateLocation();
+        IPath metadataPath = this.getStateLocation();
         IPath initGradlePath = metadataPath.append("init.gradle");
         IPath pluginPath = metadataPath.append("repo").append("redhat-plugin-1.0.jar");
         Bundle bundle = Platform.getBundle("javaee.core");
@@ -46,6 +56,7 @@ public class Activator extends AbstractUIPlugin {
         URL pluginUrl = bundle.getEntry("repo/libs/redhat-plugin/1.0/redhat-plugin-1.0.jar");
         File initFile = null;
         File pluginFile = null;
+        
         try {
             initFile = new File(FileLocator.resolve(initUrl).toURI());
             pluginFile = new File(FileLocator.resolve(pluginUrl).toURI());
@@ -54,7 +65,7 @@ public class Activator extends AbstractUIPlugin {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        replaceLine(initFile, pluginFile.getParentFile().getAbsolutePath());
+        
         copyFile(initFile, new File(initGradlePath.toString()));
         copyFile(pluginFile, new File(pluginPath.toString()));
     }
@@ -103,17 +114,4 @@ public class Activator extends AbstractUIPlugin {
         }
     }
     
-    public static void replaceLine(File file, String line) {
-        Path path = Paths.get(file.getAbsolutePath());
-        Charset charset = StandardCharsets.UTF_8;
-
-        String content;
-        try {
-            content = new String(Files.readAllBytes(path), charset);
-            content = content.replaceAll("REDHAT-PLUGIN", line);
-            Files.write(path, content.getBytes(charset));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
