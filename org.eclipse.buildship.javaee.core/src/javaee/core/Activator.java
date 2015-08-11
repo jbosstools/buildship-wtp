@@ -51,7 +51,7 @@ public class Activator extends AbstractUIPlugin {
         IPath metadataPath = this.getStateLocation();
         IPath initGradlePath = metadataPath.append("init.gradle");
         IPath pluginPath = metadataPath.append("repo").append("redhat-plugin-1.0.jar");
-        Bundle bundle = Platform.getBundle("javaee.core");
+        Bundle bundle = Platform.getBundle("org.eclipse.javaee.core");
         URL initUrl = bundle.getEntry("init.gradle");
         URL pluginUrl = bundle.getEntry("repo/libs/redhat-plugin/1.0/redhat-plugin-1.0.jar");
         File initFile = null;
