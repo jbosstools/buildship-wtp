@@ -37,7 +37,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
     // The plug-in ID
-    public static final String PLUGIN_ID = "javaee.core"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "org.eclipse.buildship.javaee.core"; //$NON-NLS-1$
 
     // The shared instance
     private static Activator plugin;
@@ -51,9 +51,9 @@ public class Activator extends AbstractUIPlugin {
         IPath metadataPath = this.getStateLocation();
         IPath initGradlePath = metadataPath.append("init.gradle");
         IPath pluginPath = metadataPath.append("repo").append("redhat-plugin-1.0.jar");
-        Bundle bundle = Platform.getBundle("org.eclipse.javaee.core");
+        Bundle bundle = Platform.getBundle(PLUGIN_ID);
         URL initUrl = bundle.getEntry("init.gradle");
-        URL pluginUrl = bundle.getEntry("repo/libs/redhat-plugin/1.0/redhat-plugin-1.0.jar");
+        URL pluginUrl = bundle.getEntry("repo/libs/redhat-plugin-1.0.jar");
         File initFile = null;
         File pluginFile = null;
         

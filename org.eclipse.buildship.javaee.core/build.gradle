@@ -1,5 +1,2 @@
 apply plugin: eclipsebuild.BundlePlugin
-
-dependencies {
-	compile gradleApi()
-}
+apply plugin: 'java'
