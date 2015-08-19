@@ -35,10 +35,8 @@ import com.google.common.collect.ImmutableList.Builder;
  * @see org.eclipse.core.commands.AbstractHandler
  */
 public class Handler extends AbstractHandler {
-    /**
-     * The constructor.
-     */
-    public Handler() {
+
+	public Handler() {
     }
 
     /**
