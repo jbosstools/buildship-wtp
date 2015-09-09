@@ -17,11 +17,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -36,10 +31,9 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 
-    // The plug-in ID
     public static final String PLUGIN_ID = "org.eclipse.buildship.javaee.core"; //$NON-NLS-1$
-
-    // The shared instance
+    public static final String GRADLE_PLUGIN_PATH = "repo/libs/redhat-plugin-1.0.jar";
+    public static final String INIT_GRADLE_PATH = "init.gradle";
     private static Activator plugin;
     
     public Activator() {
@@ -47,13 +41,16 @@ public class Activator extends AbstractUIPlugin {
 
     public void start(BundleContext context) throws Exception {
         super.start(context);
+        
         plugin = this;
         IPath metadataPath = this.getStateLocation();
-        IPath initGradlePath = metadataPath.append("init.gradle");
+        
+        // TODO: Check that path can be appended like this (a/b/c).
+        IPath initGradlePath = metadataPath.append(INIT_GRADLE_PATH);
         IPath pluginPath = metadataPath.append("repo").append("redhat-plugin-1.0.jar");
         Bundle bundle = Platform.getBundle(PLUGIN_ID);
-        URL initUrl = bundle.getEntry("init.gradle");
-        URL pluginUrl = bundle.getEntry("repo/libs/redhat-plugin-1.0.jar");
+        URL initUrl = bundle.getEntry(INIT_GRADLE_PATH);
+        URL pluginUrl = bundle.getEntry(GRADLE_PLUGIN_PATH);
         File initFile = null;
         File pluginFile = null;
         

@@ -61,7 +61,6 @@ public class Handler extends AbstractHandler {
             IStructuredSelection selection = (IStructuredSelection) currentSelection;
             IAdapterManager adapterManager = Platform.getAdapterManager();
             for (Object selectionItem : selection.toList()) {
-                @SuppressWarnings({ "cast", "RedundantCast" })
                 IResource resource = (IResource) adapterManager.getAdapter(selectionItem, IResource.class);
                 if (resource != null) {
                     IProject project = resource.getProject();
