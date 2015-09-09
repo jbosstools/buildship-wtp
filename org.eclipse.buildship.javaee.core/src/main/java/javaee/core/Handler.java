@@ -36,9 +36,6 @@ import com.google.common.collect.ImmutableList.Builder;
  */
 public class Handler extends AbstractHandler {
 
-	public Handler() {
-    }
-
     /**
      * the command has been executed, so extract extract the needed information
      * from the application context.
