@@ -1,8 +1,8 @@
 {
   "1.0": {
-    "project_path": ":org.eclipse.buildship.javaee.plugin",
-    "project_dir": "/home/istewart/Development/javaee/org.eclipse.buildship.javaee.plugin",
-    "connection_project_dir": "/home/istewart/Development/javaee",
+    "project_path": ":org.eclipse.buildship.javaee.gradle.plugin",
+    "project_dir": "/home/istewart/Development/buildship-javaee/org.eclipse.buildship.javaee.gradle.plugin",
+    "connection_project_dir": "/home/istewart/Development/buildship-javaee",
     "connection_gradle_user_home": null,
     "connection_gradle_distribution": "GRADLE_DISTRIBUTION(WRAPPER)",
     "connection_java_home": null,

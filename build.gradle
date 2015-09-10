@@ -299,6 +299,13 @@ String getVersion(def baseVersion) {
     }
 }
 
+task zipUpdateSite(type: Zip) {
+    from 'org.eclipse.buildship.javaee.site/build/repository'
+    into 'org.eclipse.buildship.site/target/'
+    baseName = 'org.eclipse.buildship.site-jbosstools-0.1'
+}
+
+
 wrapper.gradleVersion = '2.4-20150209230027+0000'
 
 
