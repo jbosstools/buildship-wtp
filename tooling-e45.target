@@ -26,7 +26,7 @@
 <repository location="http://dev1.gradle.org:8000/eclipse/update-site/mirror/release-mars/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.buildship.feature.group" version="1.0.2.v20150910-1935-s"/>
+<unit id="org.eclipse.buildship.feature.group" version="0.0.0"/>
 <repository location="http://download.jboss.org/jbosstools/mars/snapshots/builds/buildship_jbosstools-buildship/all/repo/"/>
 </location>
 </locations>
