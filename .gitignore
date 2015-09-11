@@ -1,0 +1,6 @@
+.gradle
+.settings
+.eclipse
+build
+target
+bin
