@@ -18,28 +18,27 @@ import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
 
+import javaee.model.WarModel;
+
 public class Runner {
 
     private static final String INIT_FILE_PATH = Activator.getDefault().getStateLocation().append("init.gradle").toString();
 
     /**
      * Analyzes the project located at projectPath.
-     * 
-     * @param projectPath
-     *            The path of the project to be analyzed.
      */
     public List<String> analyzeProject(String projectPath) {
         GradleConnector connector = initializeConnector(projectPath);
         ProjectConnection connection = null;
-        List<String> lis;
+        List<String> warProperties;
         try {
             connection = connector.connect();
             WarModel model = getCustomModel(connection);
-            lis = analyzeWarProperties(model);
+            warProperties = analyzeWarProperties(model);
         } finally {
             closeConnection(connection);
         }
-        return lis;
+        return warProperties;
     }
 
     private GradleConnector initializeConnector(String projectPath) {

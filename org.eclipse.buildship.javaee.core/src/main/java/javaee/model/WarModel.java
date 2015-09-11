@@ -8,7 +8,7 @@
  * Contributors:
  * Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
-package javaee.core;
+package javaee.model;
 
 public interface WarModel {
     boolean hasWarPlugin();
