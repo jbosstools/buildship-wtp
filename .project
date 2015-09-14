@@ -132,5 +132,14 @@
 				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.gradle.plugin</arguments>
 			</matcher>
 		</filter>
+		<filter>
+			<id>1442254747576</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.core.test</arguments>
+			</matcher>
+		</filter>
 	</filteredResources>
 </projectDescription>

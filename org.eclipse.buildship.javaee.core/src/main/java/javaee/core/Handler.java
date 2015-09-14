@@ -44,7 +44,7 @@ public class Handler extends AbstractHandler {
         IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 
         List<IProject> projects = collectSelectedProjects(event);
-        Runner tar = new Runner();
+        ProjectAnalyzer tar = new ProjectAnalyzer();
         MessageDialog.openInformation(window.getShell(), "Jboss-gradle",
                 tar.analyzeProject(projects.get(0).getLocation().toString()).toString());
 

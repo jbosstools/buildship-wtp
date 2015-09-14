@@ -20,7 +20,7 @@ import org.gradle.tooling.ProjectConnection;
 
 import javaee.model.WarModel;
 
-public class Runner {
+public class ProjectAnalyzer {
 
     private static final String INIT_FILE_PATH = Activator.getDefault().getStateLocation().append("init.gradle").toString();
 
