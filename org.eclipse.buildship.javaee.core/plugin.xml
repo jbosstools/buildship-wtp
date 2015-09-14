@@ -45,5 +45,11 @@
         </menu>
        </menuContribution>
   </extension>
+  
+  <extension
+       point="org.eclipse.buildship.core.projectconfigurators">
+       <configurator
+            class="javaee.configurator.WarProjectConfigurator"/>
+  </extension>
 
 </plugin>
