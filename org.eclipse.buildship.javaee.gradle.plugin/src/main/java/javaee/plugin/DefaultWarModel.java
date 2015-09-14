@@ -19,6 +19,7 @@ import org.gradle.api.plugins.WarPlugin;
  * The model implementation for projects that apply the 'war' plugin.
  */
 public class DefaultWarModel implements Serializable {
+    private static final long serialVersionUID = 9018119464493565582L;
     private final List<String> pluginClassNames;
     private final File webAppDir;
     private final String webAppDirName;
@@ -32,7 +33,7 @@ public class DefaultWarModel implements Serializable {
     }
 
     public boolean hasWarPlugin() {
-        return pluginClassNames.contains(WarPlugin.class.getName());
+        return this.pluginClassNames.contains(WarPlugin.class.getName());
     }
 
     public File getWebAppDir() {

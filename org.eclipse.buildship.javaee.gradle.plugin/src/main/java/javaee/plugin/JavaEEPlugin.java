@@ -24,11 +24,12 @@ public class JavaEEPlugin implements Plugin<Project> {
 
     @Inject
     public JavaEEPlugin(ToolingModelBuilderRegistry registry) {
+        System.out.println(">> PLUGIN");
         this.registry = registry;
     }
 
     @Override
     public void apply(Project project) {
-        registry.register(new JavaEEModelBuilder());
+        this.registry.register(new JavaEEModelBuilder());
     }
 }

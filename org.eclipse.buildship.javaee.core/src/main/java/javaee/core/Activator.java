@@ -32,25 +32,25 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
     public static final String PLUGIN_ID = "org.eclipse.buildship.javaee.core"; //$NON-NLS-1$
-    public static final String GRADLE_PLUGIN_PATH = "repo/libs/redhat-plugin-1.0.jar";
-    public static final String INIT_GRADLE_PATH = "init.gradle";
     private static Activator plugin;
-    
+
+    @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
-        
+
         plugin = this;
         IPath metadataPath = this.getStateLocation();
-        
-        // TODO: Check that path can be appended like this (a/b/c).
-        IPath initGradlePath = metadataPath.append(INIT_GRADLE_PATH);
+
+        System.out.println("Start");
+
+        IPath initGradlePath = metadataPath.append("init.gradle");
         IPath pluginPath = metadataPath.append("repo").append("redhat-plugin-1.0.jar");
         Bundle bundle = Platform.getBundle(PLUGIN_ID);
-        URL initUrl = bundle.getEntry(INIT_GRADLE_PATH);
-        URL pluginUrl = bundle.getEntry(GRADLE_PLUGIN_PATH);
+        URL initUrl = bundle.getEntry("init.gradle");
+        URL pluginUrl = bundle.getEntry("repo/libs/redhat-plugin-1.0.jar");
         File initFile = null;
         File pluginFile = null;
-        
+
         try {
             initFile = new File(FileLocator.resolve(initUrl).toURI());
             pluginFile = new File(FileLocator.resolve(pluginUrl).toURI());
@@ -59,11 +59,12 @@ public class Activator extends AbstractUIPlugin {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        
+
         copyFile(initFile, new File(initGradlePath.toString()));
         copyFile(pluginFile, new File(pluginPath.toString()));
     }
 
+    @Override
     public void stop(BundleContext context) throws Exception {
         plugin = null;
         super.stop(context);
@@ -83,13 +84,13 @@ public class Activator extends AbstractUIPlugin {
     public static ImageDescriptor getImageDescriptor(String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
-    
+
     public static void copyFile(File sourceFile, File destFile) throws IOException {
         if (!destFile.exists()) {
             destFile.getParentFile().mkdirs();
             destFile.createNewFile();
         }
-        
+
         FileChannel source = null;
         FileChannel destination = null;
 
@@ -107,5 +108,5 @@ public class Activator extends AbstractUIPlugin {
             }
         }
     }
-    
+
 }

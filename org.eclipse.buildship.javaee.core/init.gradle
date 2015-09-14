@@ -1,17 +1,16 @@
-//initscript.directory = "/home/istewart/buildship-master11/runtime-EclipseApplication/.metadata/.plugins/javaee.core/repo"
-
 initscript {
     repositories {
         flatDir {
-			dirs getStartParameter().getSystemPropertiesArgs().get('pluginDirectory')
+            dirs getStartParameter().getSystemPropertiesArgs().get('pluginDirectory')
         }
     }
 
     dependencies {
-        classpath ':redhat-plugin-1.0'
+        classpath name: 'redhat-plugin-1.0'
     }
 }
 
 allprojects {
+    println 'test'
     apply plugin: javaee.plugin.JavaEEPlugin
 }

@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Ian Stewart-Binks (Red Hat, Inc.) - f
+ *     Ian Stewart-Binks (Red Hat, Inc.) -
  */
 
 package javaee.plugin;
@@ -27,7 +27,7 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
 
     @Override
     public boolean canBuild(String modelName) {
-        return modelName.equals("javaee.core.WarModel");
+        return modelName.equals("javaee.model.WarModel");
     }
 
     @Override

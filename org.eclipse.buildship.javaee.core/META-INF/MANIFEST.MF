@@ -27,4 +27,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: repo/javaee-model.jar,
  .
-Import-Package: org.eclipse.buildship.core.configuration
+Import-Package: com.gradleware.tooling.toolingmodel;version="0.6.1",
+ org.eclipse.buildship.core.configuration

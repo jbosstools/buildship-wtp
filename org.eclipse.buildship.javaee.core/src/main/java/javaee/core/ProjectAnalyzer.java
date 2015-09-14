@@ -14,11 +14,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javaee.model.WarModel;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
 
-import javaee.model.WarModel;
+import org.eclipse.core.runtime.IPath;
 
 public class ProjectAnalyzer {
 
@@ -31,6 +33,7 @@ public class ProjectAnalyzer {
         GradleConnector connector = initializeConnector(projectPath);
         ProjectConnection connection = null;
         List<String> warProperties;
+        System.out.println(INIT_FILE_PATH);
         try {
             connection = connector.connect();
             WarModel model = getCustomModel(connection);
@@ -40,7 +43,7 @@ public class ProjectAnalyzer {
         }
         return warProperties;
     }
-    
+
     public boolean isWarProject(String projectPath) {
         GradleConnector connector = initializeConnector(projectPath);
         ProjectConnection connection = null;
@@ -61,7 +64,9 @@ public class ProjectAnalyzer {
 
     private static WarModel getCustomModel(ProjectConnection connection) {
         ModelBuilder<WarModel> customModelBuilder = connection.model(WarModel.class);
-        customModelBuilder.withArguments("--init-script", INIT_FILE_PATH, "-DpluginDirectory=" + Activator.getDefault().getStateLocation().append("repo"));
+        IPath pluginDirectory = Activator.getDefault().getStateLocation().append("repo");
+        System.out.println("pluginDir: " + pluginDirectory);
+        customModelBuilder.withArguments("--init-script", INIT_FILE_PATH, "-DpluginDirectory=" + pluginDirectory);
         return customModelBuilder.get();
     }
 
