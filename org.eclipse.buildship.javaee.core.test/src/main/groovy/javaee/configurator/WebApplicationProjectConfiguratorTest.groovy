@@ -15,9 +15,9 @@ import org.eclipse.jst.common.project.facet.core.JavaFacet;
 import org.eclipse.jst.common.project.facet.core.internal.JavaFacetUtil;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
-import com.gradleware.tooling.toolingclient.GradleDistribution;
+import com.gradleware.tooling.toolingclient.GradleDistribution
 import org.eclipse.core.runtime.NullProgressMonitor
-import org.eclipse.buildship.core.util.progress.AsyncHandler;
+import org.eclipse.buildship.core.util.progress.AsyncHandler
 
 class WebApplicationProjectConfiguratorTest extends Specification {
 
@@ -40,9 +40,9 @@ class WebApplicationProjectConfiguratorTest extends Specification {
         then:
         def project = workspaceRoot.getProject(projectLocation.name);
         1 == 1
-//        IFacetedProject facetedProject = ProjectFacetsManager.create(project, true, monitor);
-//        IProjectFacetVersion javaFacetVersion = JavaFacet.FACET.getVersion(JavaFacetUtil.getCompilerLevel(project));
-//        facetedProject.hasProjectFacet(javaFacetVersion)
+        IFacetedProject facetedProject = ProjectFacetsManager.create(project, true, monitor);
+        IProjectFacetVersion javaFacetVersion = JavaFacet.FACET.getVersion(JavaFacetUtil.getCompilerLevel(project));
+        facetedProject.hasProjectFacet(javaFacetVersion)
     }
 
 

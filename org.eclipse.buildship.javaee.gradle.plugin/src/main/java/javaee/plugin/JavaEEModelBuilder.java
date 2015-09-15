@@ -64,7 +64,7 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
     }
 
     private static String getWebXmlPath(War warTask) {
-        String webXmlPath = "";
+        String webXmlPath = "src/main/webapp/WEB-INF/web.xml";
         File webXml = warTask.getWebXml();
         if (webXml != null) {
             webXmlPath = webXml.getPath();

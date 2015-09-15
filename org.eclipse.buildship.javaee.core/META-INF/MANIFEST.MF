@@ -14,7 +14,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.jst.common.project.facet.core,
+ org.eclipse.jst.j2ee.core,
  org.eclipse.jst.j2ee.web,
+ org.eclipse.jst.j2ee,
+ org.eclipse.jst.jee,
  org.eclipse.core.databinding,
  org.eclipse.core.databinding.beans,
  org.eclipse.core.databinding.property,
@@ -27,9 +30,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.databinding,
  org.eclipse.jface.text,
  org.eclipse.wst.common.project.facet.core,
+ org.eclipse.wst.common.frameworks,
  org.eclipse.buildship.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: repo/javaee-model.jar,
- .
+Bundle-ClassPath: .
 Import-Package: com.gradleware.tooling.toolingmodel;version="0.6.1"

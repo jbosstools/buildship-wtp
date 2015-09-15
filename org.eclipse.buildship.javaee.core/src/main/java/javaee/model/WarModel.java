@@ -10,10 +10,14 @@
  */
 package javaee.model;
 
+import java.io.File;
+
+// TODO: Change package names.
+// TODO: Add documentation to this.
 public interface WarModel {
     boolean hasWarPlugin();
 
-    String getWebAppDir();
+    File getWebAppDir();
 
     String getWebAppDirName();
 
