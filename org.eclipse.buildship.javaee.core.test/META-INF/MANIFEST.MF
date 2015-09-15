@@ -8,4 +8,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit
 Bundle-ClassPath: .,
  lib/spock-core-0.7-groovy-2.0.jar,
- lib/junit-dep-4.10.jar
+ lib/groovy-all-2.0.5.jar

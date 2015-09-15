@@ -45,15 +45,20 @@ public class ProjectAnalyzer {
     }
 
     public boolean isWarProject(String projectPath) {
+        return getWarModel(projectPath).hasWarPlugin();
+    }
+
+    public WarModel getWarModel(String projectPath) {
         GradleConnector connector = initializeConnector(projectPath);
         ProjectConnection connection = null;
         try {
             connection = connector.connect();
             WarModel model = getCustomModel(connection);
-            return model.hasWarPlugin();
+            return model;
         } finally {
             closeConnection(connection);
         }
+
     }
 
     private GradleConnector initializeConnector(String projectPath) {
