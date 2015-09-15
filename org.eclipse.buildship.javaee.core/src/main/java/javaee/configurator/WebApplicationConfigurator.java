@@ -20,6 +20,7 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
 import org.eclipse.buildship.core.configuration.IProjectConfigurator;
 import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
+import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
 
 public class WebApplicationConfigurator implements IProjectConfigurator {
 
@@ -43,7 +44,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IFacetedProject facetedProject;
 
         try {
-            facetedProject = ProjectFacetsManager.create(project);
+            facetedProject = ProjectFacetsManager.create(project, true, monitor);
             installJavaFacet(actions, project, facetedProject);
             facetedProject.modify(actions, monitor);
         } catch (CoreException e) {
@@ -56,6 +57,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     private void installJavaFacet(Set<Action> actions, IProject project, IFacetedProject facetedProject) {
         // Source for JavaFacetUtil: https://eclipse.googlesource.com/webtools-common/webtools.common.fproj/+/b01e5326cd9de1afb60f6a25a81c7b152a08b526/plugins/org.eclipse.jst.common.project.facet.core/src/org/eclipse/jst/common/project/facet/core/internal/JavaFacetUtil.java
         // May be worthwhile not using an internal method.
+        @SuppressWarnings("restriction")
         IProjectFacetVersion javaFacetVersion = JavaFacet.FACET.getVersion(JavaFacetUtil.getCompilerLevel(project));
 
         if (!facetedProject.hasProjectFacet(JavaFacet.FACET)) {

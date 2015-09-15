@@ -49,7 +49,7 @@
   <extension
        point="org.eclipse.buildship.core.projectconfigurators">
        <configurator
-            class="javaee.configurator.WarProjectConfigurator"/>
+            class="javaee.configurator.WebApplicationConfigurator"/>
   </extension>
 
 </plugin>
