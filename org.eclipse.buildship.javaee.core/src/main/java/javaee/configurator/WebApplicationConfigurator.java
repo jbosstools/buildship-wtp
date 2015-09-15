@@ -21,7 +21,7 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 import org.eclipse.buildship.core.configuration.IProjectConfigurator;
 import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
 
-public class WarProjectConfigurator implements IProjectConfigurator {
+public class WebApplicationConfigurator implements IProjectConfigurator {
 
     @Override
     public boolean canConfigure(ProjectConfigurationRequest configurationRequest) {
