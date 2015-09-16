@@ -2,8 +2,13 @@ package org.eclipse.buildship.javaee.core.configurator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -11,6 +16,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
 import org.eclipse.jst.common.project.facet.core.internal.JavaFacetUtil;
 import org.eclipse.jst.j2ee.internal.J2EEVersionConstants;
@@ -58,6 +68,11 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     public IStatus configure(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) {
         MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, "", null);
         configureFacets(configurationRequest, monitor, multiStatus);
+        try {
+            makeGradleContainerDeployable(configurationRequest, monitor);
+        } catch (JavaModelException e) {
+            // add to multistatus
+        }
         return multiStatus;
     }
 
@@ -100,15 +115,16 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IProjectFacetVersion webFacetVersion = getWebFacetVersion(project, warModel);
         // TODO: Check target platform for error "java.lang.NullPointerException at org.eclipse.jst.jee.ui.internal.navigator.JEE5ContentProvider.getCachedModelProvider(JEE5ContentProvider.java:77)
         String webAppDirName = warModel.getWebAppDirName();
-        IDataModel webModelCfg = DataModelFactory.createDataModel(new WebFacetInstallDataModelProvider());
-        webModelCfg.setProperty(IJ2EEModuleFacetInstallDataModelProperties.CONFIG_FOLDER, webAppDirName);
-        webModelCfg.setProperty(IJ2EEModuleFacetInstallDataModelProperties.GENERATE_DD, false);
-        webModelCfg.setBooleanProperty(IWebFacetInstallDataModelProperties.ADD_TO_EAR, false);
+
+        IDataModel webModelConfig = DataModelFactory.createDataModel(new WebFacetInstallDataModelProvider());
+        webModelConfig.setProperty(IJ2EEModuleFacetInstallDataModelProperties.CONFIG_FOLDER, webAppDirName);
+        webModelConfig.setProperty(IJ2EEModuleFacetInstallDataModelProperties.GENERATE_DD, false);
+        webModelConfig.setBooleanProperty(IWebFacetInstallDataModelProperties.ADD_TO_EAR, false);
 
         if (!facetedProject.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
-            actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.INSTALL, webFacetVersion, webModelCfg));
+            actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.INSTALL, webFacetVersion, webModelConfig));
         } else {
-            actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.VERSION_CHANGE, webFacetVersion, webModelCfg));
+            actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.VERSION_CHANGE, webFacetVersion, webModelConfig));
         }
     }
 
@@ -145,7 +161,33 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             }
         }
 
+        // The default dynamic web facet version has been chosen to be 25
+        // such that it complies with Java versions starting from 1.6.
         return WebFacetUtils.WEB_25;
+    }
+
+    private void makeGradleContainerDeployable(ProjectConfigurationRequest projectConfigurationRequest, IProgressMonitor monitor) throws JavaModelException {
+        IProject workspaceProject = projectConfigurationRequest.getWorkspaceProject();
+        IJavaProject javaProject = JavaCore.create(workspaceProject);
+
+        IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
+        ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+
+        for (IClasspathEntry entry : classpathEntries) {
+            String path = entry.getPath().toString();
+            if (path.equals("org.eclipse.buildship.core.gradleclasspathcontainer")) {
+                IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute("org.eclipse.jst.component.dependency", "/WEB-INF/lib");
+                List<IClasspathAttribute> gradleContainerAttributes = new ArrayList(Arrays.asList(entry.getExtraAttributes()));
+                gradleContainerAttributes.add(newAttribute);
+                IClasspathEntry newGradleContainerEntry = JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes.toArray(new IClasspathAttribute[gradleContainerAttributes.size()]), entry.isExported());
+                newEntries.add(newGradleContainerEntry);
+            } else {
+                newEntries.add(entry);
+            }
+
+        }
+
+        javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
     }
 
 }
