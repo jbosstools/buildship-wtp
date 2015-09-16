@@ -8,8 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -40,6 +38,7 @@ import org.eclipse.buildship.core.configuration.IProjectConfigurator;
 import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
 import org.eclipse.buildship.javaee.core.Activator;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
+import org.eclipse.buildship.javaee.core.ResourceCleaner;
 import org.eclipse.buildship.javaee.core.model.WarModel;
 
 /**
@@ -51,6 +50,7 @@ import org.eclipse.buildship.javaee.core.model.WarModel;
  * 2.
  *
  */
+@SuppressWarnings({ "restriction" })
 public class WebApplicationConfigurator implements IProjectConfigurator {
 
     private static final int WEB_3_1_ID = 31;
@@ -78,15 +78,21 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
     private void configureFacets(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor, MultiStatus multiStatus) {
         Set<Action> actions = new LinkedHashSet<Action>();
-        IProject project = configurationRequest.getWorkspaceProject();
+        IProject workspaceProject = configurationRequest.getWorkspaceProject();
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
         IFacetedProject facetedProject;
+        ProjectAnalyzer analyzer = new ProjectAnalyzer();
+        WarModel warModel = analyzer.getWarModel(projectPath);
 
+        ResourceCleaner cleaner = new ResourceCleaner(workspaceProject, workspaceProject.getFolder(warModel.getWebAppDirName()));
+        cleaner.collectWtpFolders(warModel);
         try {
-            facetedProject = ProjectFacetsManager.create(project, true, monitor);
-            installJavaFacet(actions, project, facetedProject);
-            installWebFacet(actions, project, facetedProject, projectPath);
+            facetedProject = ProjectFacetsManager.create(workspaceProject, true, monitor);
+            installJavaFacet(actions, workspaceProject, facetedProject);
+            installWebFacet(actions, workspaceProject, facetedProject, projectPath);
+            System.out.println(actions);
             facetedProject.modify(actions, monitor);
+            cleaner.clean(monitor);
         } catch (CoreException e) {
             // change multistatus
             e.printStackTrace();
@@ -99,7 +105,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         // Source for JavaFacetUtil:
         // https://eclipse.googlesource.com/webtools-common/webtools.common.fproj/+/b01e5326cd9de1afb60f6a25a81c7b152a08b526/plugins/org.eclipse.jst.common.project.facet.core/src/org/eclipse/jst/common/project/facet/core/internal/JavaFacetUtil.java
         // May be worthwhile not using an internal method.
-        @SuppressWarnings("restriction")
         IProjectFacetVersion javaFacetVersion = JavaFacet.FACET.getVersion(JavaFacetUtil.getCompilerLevel(project));
 
         if (!facetedProject.hasProjectFacet(JavaFacet.FACET)) {
@@ -177,7 +182,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             String path = entry.getPath().toString();
             if (path.equals("org.eclipse.buildship.core.gradleclasspathcontainer")) {
                 IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute("org.eclipse.jst.component.dependency", "/WEB-INF/lib");
-                List<IClasspathAttribute> gradleContainerAttributes = new ArrayList(Arrays.asList(entry.getExtraAttributes()));
+                List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
                 gradleContainerAttributes.add(newAttribute);
                 IClasspathEntry newGradleContainerEntry = JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes.toArray(new IClasspathAttribute[gradleContainerAttributes.size()]), entry.isExported());
                 newEntries.add(newGradleContainerEntry);
