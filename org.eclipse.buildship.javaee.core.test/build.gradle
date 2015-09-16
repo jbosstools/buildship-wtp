@@ -1,1 +1,2 @@
+apply plugin: eclipsebuild.TestBundlePlugin
 apply plugin: 'groovy'
