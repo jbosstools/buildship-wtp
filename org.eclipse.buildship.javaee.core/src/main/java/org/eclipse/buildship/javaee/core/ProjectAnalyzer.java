@@ -6,21 +6,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
+ *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
-package javaee.core;
+package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javaee.model.WarModel;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
 
 import org.eclipse.core.runtime.IPath;
+
+import org.eclipse.buildship.javaee.core.model.WarModel;
 
 public class ProjectAnalyzer {
 
@@ -30,18 +31,8 @@ public class ProjectAnalyzer {
      * Analyzes the project located at projectPath.
      */
     public List<String> analyzeProject(String projectPath) {
-        GradleConnector connector = initializeConnector(projectPath);
-        ProjectConnection connection = null;
-        List<String> warProperties;
-        System.out.println(INIT_FILE_PATH);
-        try {
-            connection = connector.connect();
-            WarModel model = getCustomModel(connection);
-            warProperties = analyzeWarProperties(model);
-        } finally {
-            closeConnection(connection);
-        }
-        return warProperties;
+        WarModel warModel = getWarModel(projectPath);
+        return analyzeWarProperties(warModel);
     }
 
     public boolean isWarProject(String projectPath) {
@@ -76,12 +67,13 @@ public class ProjectAnalyzer {
     }
 
     private List<String> analyzeWarProperties(WarModel model) {
+        String webAppdirName = "";
+        String webXmlName = "";
         if (model.hasWarPlugin()) {
-            String a = model.getWebAppDirName();
-            String b = model.getWebXmlName();
-            return Arrays.asList(a, b);
+            webAppdirName = model.getWebAppDirName();
+            webXmlName = model.getWebXmlName();
         }
-        return new ArrayList<String>();
+        return Arrays.asList(webAppdirName, webXmlName);
     }
 
     private void closeConnection(ProjectConnection connection) {
@@ -89,4 +81,5 @@ public class ProjectAnalyzer {
             connection.close();
         }
     }
+
 }

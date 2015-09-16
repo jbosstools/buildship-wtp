@@ -9,7 +9,7 @@
  *     Ian Stewart-Binks (Red Hat, Inc.) -
  */
 
-package javaee.plugin;
+package org.eclipse.buildship.javaee.gradle.plugin;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
 
     @Override
     public boolean canBuild(String modelName) {
-        return modelName.equals("javaee.model.WarModel");
+        return modelName.equals("org.eclipse.buildship.javaee.core.model.WarModel");
     }
 
     @Override

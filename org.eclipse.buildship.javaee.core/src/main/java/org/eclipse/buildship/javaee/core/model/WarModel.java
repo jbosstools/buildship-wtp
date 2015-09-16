@@ -8,7 +8,7 @@
  * Contributors:
  * Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
-package javaee.model;
+package org.eclipse.buildship.javaee.core.model;
 
 import java.io.File;
 

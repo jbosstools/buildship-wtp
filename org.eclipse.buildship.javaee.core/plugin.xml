@@ -15,7 +15,7 @@
          point="org.eclipse.ui.handlers">
       <handler
             commandId="jbossgradle.ui.commands.refreshproject"
-            class="javaee.core.Handler">
+            class="org.eclipse.buildship.javaee.core.Handler">
       </handler>
    </extension>
    
@@ -49,7 +49,7 @@
   <extension
        point="org.eclipse.buildship.core.projectconfigurators">
        <configurator
-            class="javaee.configurator.WebApplicationConfigurator"/>
+            class="org.eclipse.buildship.javaee.core.configurator.WebApplicationConfigurator"/>
   </extension>
 
 </plugin>

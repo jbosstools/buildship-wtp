@@ -1,13 +1,9 @@
-package javaee.configurator;
+package org.eclipse.buildship.javaee.core.configurator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import javaee.core.Activator;
-import javaee.core.ProjectAnalyzer;
-import javaee.model.WarModel;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -32,11 +28,22 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
 import org.eclipse.buildship.core.configuration.IProjectConfigurator;
 import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
+import org.eclipse.buildship.javaee.core.Activator;
+import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
+import org.eclipse.buildship.javaee.core.model.WarModel;
 
+/**
+ * Configures an Eclipse Web Application project. The configurator is applied if and only if the given
+ * project applies the Gradle 'war' plugin.
+ *
+ * This configurator implements the following steps, in this order:
+ * 1. Add the Java web facet, and the Dynamic web facet.
+ * 2.
+ *
+ */
 public class WebApplicationConfigurator implements IProjectConfigurator {
 
     private static final int WEB_3_1_ID = 31;
-
     private static final String WEB_3_1_TEXT = "3.1"; //$NON-NLS-1$
     private static final IProjectFacetVersion WEB_31 = WebFacetUtils.WEB_FACET.hasVersion(WEB_3_1_TEXT) ? WebFacetUtils.WEB_FACET.getVersion(WEB_3_1_TEXT) : WebFacetUtils.WEB_30;
 
@@ -91,15 +98,17 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         ProjectAnalyzer analyzer = new ProjectAnalyzer();
         WarModel warModel = analyzer.getWarModel(projectPath);
         IProjectFacetVersion webFacetVersion = getWebFacetVersion(project, warModel);
-
-        IDataModel webModelConfig = DataModelFactory.createDataModel(new WebFacetInstallDataModelProvider());
-        webModelConfig.setProperty(IJ2EEModuleFacetInstallDataModelProperties.GENERATE_DD, false);
-        webModelConfig.setBooleanProperty(IWebFacetInstallDataModelProperties.ADD_TO_EAR, false);
+        // TODO: Check target platform for error "java.lang.NullPointerException at org.eclipse.jst.jee.ui.internal.navigator.JEE5ContentProvider.getCachedModelProvider(JEE5ContentProvider.java:77)
+        String webAppDirName = warModel.getWebAppDirName();
+        IDataModel webModelCfg = DataModelFactory.createDataModel(new WebFacetInstallDataModelProvider());
+        webModelCfg.setProperty(IJ2EEModuleFacetInstallDataModelProperties.CONFIG_FOLDER, webAppDirName);
+        webModelCfg.setProperty(IJ2EEModuleFacetInstallDataModelProperties.GENERATE_DD, false);
+        webModelCfg.setBooleanProperty(IWebFacetInstallDataModelProperties.ADD_TO_EAR, false);
 
         if (!facetedProject.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
-            actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.INSTALL, webFacetVersion, webModelConfig));
+            actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.INSTALL, webFacetVersion, webModelCfg));
         } else {
-            actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.VERSION_CHANGE, webFacetVersion, webModelConfig));
+            actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.VERSION_CHANGE, webFacetVersion, webModelCfg));
         }
     }
 

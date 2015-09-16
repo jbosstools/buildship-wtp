@@ -8,7 +8,7 @@
  * Contributors:
  *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
-package javaee.plugin;
+package org.eclipse.buildship.javaee.gradle.plugin;
 
 import java.io.File;
 import java.io.Serializable;

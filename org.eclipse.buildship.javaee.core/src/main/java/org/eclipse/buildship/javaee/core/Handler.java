@@ -8,7 +8,7 @@
  * Contributors:
  * Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
-package javaee.core;
+package org.eclipse.buildship.javaee.core;
 
 import java.util.List;
 
@@ -29,10 +29,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 
 /**
- * Our sample handler extends AbstractHandler, an IHandler base class.
- * 
- * @see org.eclipse.core.commands.IHandler
- * @see org.eclipse.core.commands.AbstractHandler
+ * Meant for easy testing purposes.
  */
 public class Handler extends AbstractHandler {
 
@@ -40,6 +37,7 @@ public class Handler extends AbstractHandler {
      * the command has been executed, so extract extract the needed information
      * from the application context.
      */
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 
