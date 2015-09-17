@@ -26,22 +26,14 @@ public class ProjectAnalyzer {
 
     private static final String INIT_FILE_PATH = Activator.getDefault().getStateLocation().append("init.gradle").toString();
 
-    /**
-     * Analyzes the project located at projectPath.
-     */
-    public List<String> analyzeProject(String projectPath) {
-        WarModel warModel = getWarModel(projectPath);
-        return analyzeWarProperties(warModel);
-    }
-
     public boolean isWarProject(String projectPath) {
         return getWarModel(projectPath).hasWarPlugin();
     }
 
     public WarModel getWarModel(String projectPath) {
-        GradleConnector connector = initializeConnector(projectPath);
         ProjectConnection connection = null;
         try {
+            GradleConnector connector = initializeConnector(projectPath);
             connection = connector.connect();
             WarModel model = getCustomModel(connection);
             return model;
@@ -60,19 +52,8 @@ public class ProjectAnalyzer {
     private static WarModel getCustomModel(ProjectConnection connection) {
         ModelBuilder<WarModel> customModelBuilder = connection.model(WarModel.class);
         IPath pluginDirectory = Activator.getDefault().getStateLocation().append("repo");
-        System.out.println("pluginDir: " + pluginDirectory);
         customModelBuilder.withArguments("--init-script", INIT_FILE_PATH, "-DpluginDirectory=" + pluginDirectory);
         return customModelBuilder.get();
-    }
-
-    private List<String> analyzeWarProperties(WarModel model) {
-        String webAppdirName = "";
-        String webXmlName = "";
-        if (model.hasWarPlugin()) {
-            webAppdirName = model.getWebAppDirName();
-            webXmlName = model.getWebXmlName();
-        }
-        return Arrays.asList(webAppdirName, webXmlName);
     }
 
     private void closeConnection(ProjectConnection connection) {

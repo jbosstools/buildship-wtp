@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -13,14 +15,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import com.google.common.base.Preconditions;
 
 import org.eclipse.buildship.javaee.core.model.WarModel;
 
 /**
  * When the Dynamic Web Facet is added to a project, multiple redundant resources are also added to
  * a project. This class is meant to identify those resources and delete them.
- *
  */
 public class ResourceCleaner {
 
@@ -28,20 +28,20 @@ public class ResourceCleaner {
 
     private List<IFile> filesToDelete = new ArrayList<IFile>();
     private List<IFolder> foldersToDelete = new ArrayList<IFolder>();
-    private Set<IFolder> existingResources = new HashSet<IFolder>();
+    private Set<IFolder> resourcesToKeep = new HashSet<IFolder>();
 
     public ResourceCleaner(IProject project, IFolder... foldersToKeep) {
         Preconditions.checkNotNull(foldersToKeep);
         this.project = Preconditions.checkNotNull(project);
 
+        // Essentially, this ensures that the webAppDir that is created
+        // by the web facet persists, even though it may not already exist.
         for (IFolder folder : foldersToKeep) {
-            if (folder.exists()) {
-                this.existingResources.add(folder);
-                IContainer parent = folder.getParent();
-                while (parent instanceof IFolder) {
-                    this.existingResources.add((IFolder) parent);
-                    parent = parent.getParent();
-                }
+            this.resourcesToKeep.add(folder);
+            IContainer parent = folder.getParent();
+            while (parent instanceof IFolder) {
+                this.resourcesToKeep.add((IFolder) parent);
+                parent = parent.getParent();
             }
         }
     }
@@ -60,17 +60,15 @@ public class ResourceCleaner {
      *
      */
     public void collectWtpFolders(WarModel warModel) {
-        Preconditions.checkNotNull(warModel);
-
         String webAppDirName = warModel.getWebAppDirName();
         IFolder webAppDir = this.project.getFolder(webAppDirName);
         String customWebXml = warModel.getWebXmlName();
 
+        // The dynamic web facet may have added folders to the web application directory. As such,
+        // we determine whether these folders existed *before* the dynamic web facet has been added.
         if (webAppDir.exists()) {
             addFiles(webAppDir.getFile("META-INF/MANIFEST.MF").getProjectRelativePath()); //$NON-NLS-1$
             addFolder(webAppDir.getFolder("WEB-INF/lib").getProjectRelativePath()); //$NON-NLS-1$
-        } else {
-            addFolder(webAppDir.getProjectRelativePath());
         }
 
         if (!customWebXml.equals("")) {
@@ -79,18 +77,22 @@ public class ResourceCleaner {
 
     }
 
+    /**
+     * Adds a folder to the folders to be deleted.
+     */
     private void addFolder(IPath folderPath) {
         IFolder folder = this.project.getFolder(folderPath);
 
-        if (folder != null && !folder.exists() && !folder.getProject().getFullPath().equals(folder.getFullPath())) {
+        if (folder != null && !folder.exists()) {
             this.foldersToDelete.add(folder);
             addNonexistentParentFolders(folder);
         }
     }
 
+    /**
+     * Adds a file set to the set of files to be deleted.
+     */
     private void addFiles(IPath... filePaths) {
-        Preconditions.checkNotNull(filePaths);
-
         for (IPath fileName : filePaths) {
             IFile fileToDelete = this.project.getFile(fileName);
             if (!fileToDelete.exists()) {
@@ -101,23 +103,32 @@ public class ResourceCleaner {
     }
 
     /**
-     * Determines if a resource's parent resources are redundant WTP resources.
+     * Determines if a resource's parent resources are redundant resources.
      */
     private void addNonexistentParentFolders(IResource resource) {
         IContainer parentContainer = resource.getParent();
-        while (parentContainer instanceof IFolder) {
-            if (this.existingResources.contains(parentContainer) || parentContainer.exists()) {
-                break;
-            }
-            IFolder parent = (IFolder) parentContainer;
-            this.foldersToDelete.add(parent);
+
+        while (containerShouldBeDeleted(parentContainer)) {
+            this.foldersToDelete.add((IFolder) parentContainer);
             parentContainer = parentContainer.getParent();
         }
     }
 
     /**
-     * Cleans up folders that WTP has generated that were cataloged by the collectWtpFolders
-     * method. This method *must* be called after the collectWtpFolders in order to delete anything.
+     * Determines if a container should be deleted in the future.
+     *
+     * Containers are flagged as folders to delete in the future if they satisfy three conditions:
+     * 1. The container is an instance of IFolder
+     * 2. The container has not been flagged as a protected resource.
+     * 3. The resource already exists in the project.
+     */
+    private boolean containerShouldBeDeleted(IContainer container) {
+        return container instanceof IFolder && !this.resourcesToKeep.contains(container) && !container.exists();
+    }
+
+    /**
+     * Cleans up folders that WTP has generated that were cataloged by the collectWtpFolders method.
+     * This method *must* be called after the collectWtpFolders in order to delete anything.
      */
     public void clean(IProgressMonitor monitor) throws CoreException {
         for (IFile file : this.filesToDelete) {
