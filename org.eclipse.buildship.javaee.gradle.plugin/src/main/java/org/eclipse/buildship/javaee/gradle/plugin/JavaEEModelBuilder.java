@@ -58,7 +58,7 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
 
     private static List<String> getPluginClassNames(Project project) {
         List<String> pluginClassNames = new ArrayList<String>();
-        for (Plugin plugin : project.getPlugins()) {
+        for (Plugin<?> plugin : project.getPlugins()) {
             pluginClassNames.add(plugin.getClass().getName());
         }
         return pluginClassNames;

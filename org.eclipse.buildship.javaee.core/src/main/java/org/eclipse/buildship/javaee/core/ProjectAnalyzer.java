@@ -11,8 +11,6 @@
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
@@ -35,7 +33,7 @@ public class ProjectAnalyzer {
         try {
             GradleConnector connector = initializeConnector(projectPath);
             connection = connector.connect();
-            WarModel model = getCustomModel(connection);
+            WarModel model = buildWarModel(connection);
             return model;
         } finally {
             closeConnection(connection);
@@ -48,8 +46,10 @@ public class ProjectAnalyzer {
         connector.forProjectDirectory(new File(projectPath));
         return connector;
     }
-
-    private static WarModel getCustomModel(ProjectConnection connection) {
+    /**
+     * Builds the WarModel based on what's defined in the project's Gradle build script.
+     */
+    private static WarModel buildWarModel(ProjectConnection connection) {
         ModelBuilder<WarModel> customModelBuilder = connection.model(WarModel.class);
         IPath pluginDirectory = Activator.getDefault().getStateLocation().append("repo");
         customModelBuilder.withArguments("--init-script", INIT_FILE_PATH, "-DpluginDirectory=" + pluginDirectory);
