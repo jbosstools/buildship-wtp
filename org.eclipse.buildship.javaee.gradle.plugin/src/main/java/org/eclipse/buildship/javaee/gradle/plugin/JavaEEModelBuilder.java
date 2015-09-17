@@ -27,6 +27,7 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
 
     @Override
     public boolean canBuild(String modelName) {
+        //TODO: Check to see if there is an alternative to hardcoding the name in here.
         return modelName.equals("org.eclipse.buildship.javaee.core.model.WarModel");
     }
 

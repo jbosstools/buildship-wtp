@@ -20,6 +20,7 @@ import org.eclipse.buildship.javaee.core.model.WarModel;
 /**
  * When the Dynamic Web Facet is added to a project, multiple redundant resources are also added to
  * a project. This class is meant to identify those resources and delete them.
+ *
  */
 public class ResourceCleaner {
 
@@ -46,7 +47,7 @@ public class ResourceCleaner {
     }
 
     /**
-     * This method catalogues folders/files that are generated WTP for deletion, except under the
+     * This method catalogs folders/files that are generated WTP for deletion, except under the
      * condition that the folder/file that WTP would have created is an existing folder/file in the
      * project.
      *
@@ -115,7 +116,7 @@ public class ResourceCleaner {
     }
 
     /**
-     * Cleans up folders that WTP has generated that were catalogued by the collectWtpFolders
+     * Cleans up folders that WTP has generated that were cataloged by the collectWtpFolders
      * method. This method *must* be called after the collectWtpFolders in order to delete anything.
      */
     public void clean(IProgressMonitor monitor) throws CoreException {

@@ -12,5 +12,5 @@ initscript {
 
 allprojects {
     println 'test'
-    apply plugin: javaee.plugin.JavaEEPlugin
+    apply plugin: org.eclipse.buildship.javaee.gradle.plugin.JavaEEPlugin
 }

@@ -16,7 +16,7 @@ import java.util.List;
 import org.gradle.api.plugins.WarPlugin;
 
 /**
- * The model implementation for projects that apply the 'war' plugin.
+ * The model implementation for projects that apply the 'war' plug-in.
  */
 public class DefaultWarModel implements Serializable {
     private static final long serialVersionUID = 9018119464493565582L;
@@ -32,6 +32,9 @@ public class DefaultWarModel implements Serializable {
         this.webXml = webXml;
     }
 
+    /**
+     * Determines whether the project applies the 'war' plug-in.
+     */
     public boolean hasWarPlugin() {
         return this.pluginClassNames.contains(WarPlugin.class.getName());
     }
