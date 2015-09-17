@@ -1,50 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            id="jbossgradle.ui.commands.refreshproject"
-            categoryId="jbossgradle.ui.project"
-            name="Invoke Analysis"
-            description="Invokes the tooling analysis">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="jbossgradle.ui.commands.refreshproject"
-            class="org.eclipse.buildship.javaee.core.Handler">
-      </handler>
-   </extension>
-   
-   <extension
-            point="org.eclipse.ui.menus">
-        <menuContribution
-          allPopups="true"
-          locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
-         <menu
-           id="jbossgradle.ui.contextmenuentry"
-           label="Gradle Model">
-          <command
-            commandId="jbossgradle.ui.commands.refreshproject"
-            style="push">
-           <visibleWhen
-             checkEnabled="true">
-           </visibleWhen>
-          </command>
-         </menu>
-        </menuContribution>
-       <menuContribution
-         allPopups="true"
-         locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
-        <menu
-          id="jbossgradle.ui.contextmenuentry"
-          label="Gradle Model">
-        </menu>
-       </menuContribution>
-  </extension>
   
   <extension
        point="org.eclipse.buildship.core.projectconfigurators">

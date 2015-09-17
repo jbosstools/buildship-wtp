@@ -71,7 +71,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         try {
             makeGradleContainerDeployable(configurationRequest, monitor);
         } catch (JavaModelException e) {
-            // add to multistatus
+            e.printStackTrace();
         }
         return multiStatus;
     }
@@ -128,7 +128,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         if (!facetedProject.hasProjectFacet(WebFacetUtils.WEB_FACET)) {
             actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.INSTALL, webFacetVersion, webModelConfig));
-        } else {
+        } else if (!facetedProject.hasProjectFacet(webFacetVersion)) {
             actions.add(new IFacetedProject.Action(IFacetedProject.Action.Type.VERSION_CHANGE, webFacetVersion, webModelConfig));
         }
     }
@@ -180,6 +180,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         for (IClasspathEntry entry : classpathEntries) {
             String path = entry.getPath().toString();
+            IClasspathAttribute[] attrs = entry.getExtraAttributes();
+
             if (path.equals("org.eclipse.buildship.core.gradleclasspathcontainer")) {
                 IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute("org.eclipse.jst.component.dependency", "/WEB-INF/lib");
                 List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
@@ -193,6 +195,11 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         }
 
         javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
+    }
+
+    @Override
+    public int getWeight() {
+        return 100;
     }
 
 }
