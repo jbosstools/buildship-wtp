@@ -77,4 +77,3 @@ public final class EclipsePluginTestClassScanner implements Runnable {
         public abstract void visitClassFile(FileVisitDetails fileDetails);
     }
 }
-

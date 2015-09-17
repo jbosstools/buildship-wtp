@@ -235,7 +235,7 @@ class UpdateSitePlugin implements Plugin<Project> {
             from project.configurations.signedExternalPlugin
             into new File(project.buildDir, "$SIGNED_BUNDLES_DIR_NAME/$PLUGINS_DIR_NAME")
         }
-    }	
+    }
 
     static void addTaskCompressBundles(Project project) {
         project.task(COMPRESS_BUNDLES_TASK_NAME, dependsOn: [

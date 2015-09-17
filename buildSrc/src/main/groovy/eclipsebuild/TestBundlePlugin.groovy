@@ -224,4 +224,3 @@ class TestBundlePlugin implements Plugin<Project> {
     }
 
 }
-

@@ -191,4 +191,3 @@ public final class EclipseTestListener implements ITestRunListener2 {
     }
 
 }
-
