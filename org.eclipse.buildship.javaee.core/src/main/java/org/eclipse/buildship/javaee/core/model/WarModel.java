@@ -12,9 +12,12 @@ package org.eclipse.buildship.javaee.core.model;
 
 import java.io.File;
 
-// TODO: Change package names.
-// TODO: Add documentation to this.
+/**
+ * The interface used to interact with the Gradle War model. Values pulled from the War model will
+ * be values directly declared in a project's build.gradle file.
+ */
 public interface WarModel {
+
     boolean hasWarPlugin();
 
     File getWebAppDir();

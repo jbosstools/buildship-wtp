@@ -48,57 +48,57 @@ import org.eclipse.buildship.javaee.core.model.WarModel;
  *
  * This configurator implements the following steps, in this order:
  * 1. Add the Java web facet, and the Dynamic web facet.
- * 2.
+ * 2. Remove any redundant files created by the addition of the dynamic web facet.
+ * 3. Flag test dependencies as 'non-deploy' in component file.
  *
  */
 @SuppressWarnings({ "restriction" })
 public class WebApplicationConfigurator implements IProjectConfigurator {
 
-    private static final int WEB_3_1_ID = 31;
-    private static final String WEB_3_1_TEXT = "3.1"; //$NON-NLS-1$
-    private static final IProjectFacetVersion WEB_31 = WebFacetUtils.WEB_FACET.hasVersion(WEB_3_1_TEXT) ? WebFacetUtils.WEB_FACET.getVersion(WEB_3_1_TEXT) : WebFacetUtils.WEB_30;
-
     @Override
     public boolean canConfigure(ProjectConfigurationRequest configurationRequest) {
-        ProjectAnalyzer analyzer = new ProjectAnalyzer();
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
-        return analyzer.isWarProject(projectPath);
+        return ProjectAnalyzer.isWarProject(projectPath);
     }
 
     @Override
     public IStatus configure(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) {
         MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, "", null);
-        configureFacets(configurationRequest, monitor, multiStatus);
         try {
+            configureFacets(configurationRequest, monitor, multiStatus);
             makeGradleContainerDeployable(configurationRequest, monitor);
-        } catch (JavaModelException e) {
+        } catch (Exception e) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
             multiStatus.add(errorStatus);
         }
         return multiStatus;
     }
 
-    private void configureFacets(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor, MultiStatus multiStatus) {
+    @Override
+    public int getWeight() {
+
+        // Currently, the WAR configurator's weight is set to 100, to ensure that it is called
+        // after the currently existing Java project configurator.
+        return 100;
+    }
+
+    private void configureFacets(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor, MultiStatus multiStatus) throws Exception {
         Set<Action> actions = new LinkedHashSet<Action>();
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
-        IFacetedProject facetedProject;
-        ProjectAnalyzer analyzer = new ProjectAnalyzer();
-        WarModel warModel = analyzer.getWarModel(projectPath);
+        WarModel warModel = ProjectAnalyzer.getWarModel(projectPath);
 
         ResourceCleaner cleaner = new ResourceCleaner(workspaceProject, workspaceProject.getFolder(warModel.getWebAppDirName()));
         cleaner.collectWtpFolders(warModel);
-        try {
-            facetedProject = ProjectFacetsManager.create(workspaceProject, true, monitor);
-            installJavaFacet(actions, workspaceProject, facetedProject);
-            installWebFacet(actions, workspaceProject, facetedProject, projectPath);
-            System.out.println(actions);
-            facetedProject.modify(actions, monitor);
-            cleaner.clean(monitor);
-        } catch (CoreException e) {
-            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
-            multiStatus.add(errorStatus);
-        }
+
+        IFacetedProject facetedProject = ProjectFacetsManager.create(workspaceProject, true, monitor);
+
+        installJavaFacet(actions, workspaceProject, facetedProject);
+        installWebFacet(actions, workspaceProject, facetedProject, projectPath);
+
+        facetedProject.modify(actions, monitor);
+
+        cleaner.clean(monitor);
     }
 
     // 'Inspired by'
@@ -117,10 +117,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     }
 
     private void installWebFacet(Set<Action> actions, IProject project, IFacetedProject facetedProject, String projectPath) {
-        ProjectAnalyzer analyzer = new ProjectAnalyzer();
-        WarModel warModel = analyzer.getWarModel(projectPath);
+        WarModel warModel = ProjectAnalyzer.getWarModel(projectPath);
         IProjectFacetVersion webFacetVersion = getWebFacetVersion(project, warModel);
-        // TODO: Check target platform for error "java.lang.NullPointerException at org.eclipse.jst.jee.ui.internal.navigator.JEE5ContentProvider.getCachedModelProvider(JEE5ContentProvider.java:77)
         String webAppDirName = warModel.getWebAppDirName();
 
         IDataModel webModelConfig = DataModelFactory.createDataModel(new WebFacetInstallDataModelProvider());
@@ -155,8 +153,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
                             return WebFacetUtils.WEB_25;
                         case J2EEVersionConstants.WEB_3_0_ID:
                             return WebFacetUtils.WEB_30;
-                        case WEB_3_1_ID:
-                            return WEB_31;
+                        case J2EEVersionConstants.WEB_3_1_ID:
+                            return WebFacetUtils.WEB_31;
                     }
                 } finally {
                     is.close();
@@ -197,11 +195,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         }
 
         javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
-    }
-
-    @Override
-    public int getWeight() {
-        return 100;
     }
 
 }

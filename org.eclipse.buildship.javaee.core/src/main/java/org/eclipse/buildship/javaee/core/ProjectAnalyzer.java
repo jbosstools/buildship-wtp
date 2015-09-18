@@ -26,11 +26,11 @@ public class ProjectAnalyzer {
 
     private static final String INIT_FILE_PATH = Activator.getDefault().getStateLocation().append("init.gradle").toString();
 
-    public boolean isWarProject(String projectPath) {
+    public static boolean isWarProject(String projectPath) {
         return getWarModel(projectPath).hasWarPlugin();
     }
 
-    public WarModel getWarModel(String projectPath) {
+    public static WarModel getWarModel(String projectPath) {
         ProjectConnection connection = null;
         try {
             GradleConnector connector = initializeConnector(projectPath);
@@ -43,7 +43,7 @@ public class ProjectAnalyzer {
 
     }
 
-    private GradleConnector initializeConnector(String projectPath) {
+    private static GradleConnector initializeConnector(String projectPath) {
         GradleConnector connector = GradleConnector.newConnector();
         connector.forProjectDirectory(new File(projectPath));
         return connector;
@@ -56,7 +56,7 @@ public class ProjectAnalyzer {
         return customModelBuilder.get();
     }
 
-    private void closeConnection(ProjectConnection connection) {
+    private static void closeConnection(ProjectConnection connection) {
         if (connection != null) {
             connection.close();
         }
