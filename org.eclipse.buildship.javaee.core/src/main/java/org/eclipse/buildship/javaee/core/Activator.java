@@ -39,29 +39,7 @@ public class Activator extends AbstractUIPlugin {
         super.start(context);
 
         plugin = this;
-        IPath metadataPath = this.getStateLocation();
-
-        System.out.println("Start");
-
-        IPath initGradlePath = metadataPath.append("init.gradle");
-        IPath pluginPath = metadataPath.append("repo").append("redhat-plugin-1.0.jar");
-        Bundle bundle = Platform.getBundle(PLUGIN_ID);
-        URL initUrl = bundle.getEntry("init.gradle");
-        URL pluginUrl = bundle.getEntry("repo/libs/redhat-plugin-1.0.jar");
-        File initFile = null;
-        File pluginFile = null;
-
-        try {
-            initFile = new File(FileLocator.resolve(initUrl).toURI());
-            pluginFile = new File(FileLocator.resolve(pluginUrl).toURI());
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-
-        copyFile(initFile, new File(initGradlePath.toString()));
-        copyFile(pluginFile, new File(pluginPath.toString()));
+        copyGradlePluginFilesToMetadataFolder();
     }
 
     @Override
@@ -75,16 +53,40 @@ public class Activator extends AbstractUIPlugin {
     }
 
     /**
+     * Copies the init.gradle file and the Gradle plug-in from the Core plug-in directory
+     * to the workspace's .metadata folder.
+     */
+    private void copyGradlePluginFilesToMetadataFolder() throws Exception {
+        IPath metadataPath = this.getStateLocation();
+        IPath initGradlePath = metadataPath.append("init.gradle");
+        IPath pluginPath = metadataPath.append("repo").append("redhat-plugin-1.0.jar");
+
+        Bundle bundle = Platform.getBundle(PLUGIN_ID);
+        URL initUrl = bundle.getEntry("init.gradle");
+        URL pluginUrl = bundle.getEntry("repo/libs/redhat-plugin-1.0.jar");
+        File initFile = null;
+        File pluginFile = null;
+
+        initFile = new File(FileLocator.resolve(initUrl).toURI());
+        pluginFile = new File(FileLocator.resolve(pluginUrl).toURI());
+
+        copyFile(initFile, new File(initGradlePath.toString()));
+        copyFile(pluginFile, new File(pluginPath.toString()));
+    }
+
+    /**
      * Returns an image descriptor for the image file at the given
      * plug-in relative path
-     *
-     * @param path the path
-     * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
+    @SuppressWarnings("resource")
+    /**
+     * Copies the contents of sourceFile into destFile. Creates destFile if it does
+     * not yet exist.
+     */
     public static void copyFile(File sourceFile, File destFile) throws IOException {
         if (!destFile.exists()) {
             destFile.getParentFile().mkdirs();
@@ -98,8 +100,7 @@ public class Activator extends AbstractUIPlugin {
             source = new FileInputStream(sourceFile).getChannel();
             destination = new FileOutputStream(destFile).getChannel();
             destination.transferFrom(source, 0, source.size());
-        }
-        finally {
+        } finally {
             if (source != null) {
                 source.close();
             }
