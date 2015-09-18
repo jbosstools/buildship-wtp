@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -34,8 +35,8 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject.Action;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
-import org.eclipse.buildship.core.configuration.IProjectConfigurator;
 import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
+import org.eclipse.buildship.core.configurator.IProjectConfigurator;
 import org.eclipse.buildship.javaee.core.Activator;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
 import org.eclipse.buildship.javaee.core.ResourceCleaner;
@@ -71,7 +72,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         try {
             makeGradleContainerDeployable(configurationRequest, monitor);
         } catch (JavaModelException e) {
-            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
+            multiStatus.add(errorStatus);
         }
         return multiStatus;
     }
@@ -94,8 +96,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             facetedProject.modify(actions, monitor);
             cleaner.clean(monitor);
         } catch (CoreException e) {
-            // change multistatus
-            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
+            multiStatus.add(errorStatus);
         }
     }
 
