@@ -55,6 +55,8 @@ import org.eclipse.buildship.javaee.core.model.WarModel;
 @SuppressWarnings({ "restriction" })
 public class WebApplicationConfigurator implements IProjectConfigurator {
 
+    private static final String GRADLE_CLASSPATH_CONTAINER_PATH = "org.eclipse.buildship.core.gradleclasspathcontainer";
+
     @Override
     public boolean canConfigure(ProjectConfigurationRequest configurationRequest) {
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
@@ -133,6 +135,11 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         }
     }
 
+    /**
+     * Reads the web facet version in from the web xml file. If no file exists,
+     * or if no web facet version has been declared, web facet version 2.5 is returned.
+     * TODO: Why are IOException and coreexception expected?
+     */
     private IProjectFacetVersion getWebFacetVersion(IProject project, WarModel warModel) {
         String webXmlName = warModel.getWebXmlName();
         IFile webXmlFile = project.getFile(webXmlName);
@@ -171,6 +178,9 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         return WebFacetUtils.WEB_25;
     }
 
+    /**
+     * Makes the Gradle container deployable by modifying its classpath entry.
+     */
     private void makeGradleContainerDeployable(ProjectConfigurationRequest projectConfigurationRequest, IProgressMonitor monitor) throws JavaModelException {
         IProject workspaceProject = projectConfigurationRequest.getWorkspaceProject();
         IJavaProject javaProject = JavaCore.create(workspaceProject);
@@ -180,21 +190,26 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         for (IClasspathEntry entry : classpathEntries) {
             String path = entry.getPath().toString();
-            IClasspathAttribute[] attrs = entry.getExtraAttributes();
-
-            if (path.equals("org.eclipse.buildship.core.gradleclasspathcontainer")) {
-                IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute("org.eclipse.jst.component.dependency", "/WEB-INF/lib");
-                List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
-                gradleContainerAttributes.add(newAttribute);
-                IClasspathEntry newGradleContainerEntry = JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes.toArray(new IClasspathAttribute[gradleContainerAttributes.size()]), entry.isExported());
+            if (path.equals(GRADLE_CLASSPATH_CONTAINER_PATH)) {
+                IClasspathEntry newGradleContainerEntry = modifyGradleContainerEntry(entry);
                 newEntries.add(newGradleContainerEntry);
             } else {
                 newEntries.add(entry);
             }
-
         }
 
         javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
+    }
+
+    /**
+     * Adds the org.eclipse.jst.component.dependency attribute to the Gradle classpath container attribute.
+     */
+    private IClasspathEntry modifyGradleContainerEntry(IClasspathEntry entry) {
+        IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute("org.eclipse.jst.component.dependency", "/WEB-INF/lib");
+        List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
+        gradleContainerAttributes.add(newAttribute);
+        return JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes.toArray(new IClasspathAttribute[gradleContainerAttributes.size()]), entry.isExported());
+
     }
 
 }
