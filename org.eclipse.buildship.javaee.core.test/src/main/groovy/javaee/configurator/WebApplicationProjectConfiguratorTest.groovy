@@ -7,7 +7,6 @@ import org.junit.rules.TemporaryFolder
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
 import org.eclipse.buildship.core.projectimport.ProjectImportConfiguration
-import org.eclipse.buildship.core.projectimport.ProjectImportJob
 import org.eclipse.buildship.core.util.gradle.GradleDistributionWrapper
 import org.eclipse.core.resources.IWorkspaceRoot
 import org.eclipse.core.resources.ResourcesPlugin
@@ -81,7 +80,7 @@ class WebApplicationProjectConfiguratorTest extends Specification {
         configuration.projectDir = location
         configuration.applyWorkingSets = true
         configuration.workingSets = []
-        new ProjectImportJob(configuration, AsyncHandler.NO_OP)
+//        new ProjectImportJob(configuration, AsyncHandler.NO_OP)
     }
 
 }

@@ -8,9 +8,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -28,6 +33,9 @@ import org.eclipse.jst.j2ee.web.project.facet.IWebFacetInstallDataModelPropertie
 import org.eclipse.jst.j2ee.web.project.facet.WebFacetInstallDataModelProvider;
 import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
 import org.eclipse.jst.jee.util.internal.JavaEEQuickPeek;
+import org.eclipse.wst.common.componentcore.ComponentCore;
+import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
+import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
 import org.eclipse.wst.common.frameworks.datamodel.DataModelFactory;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -43,13 +51,12 @@ import org.eclipse.buildship.javaee.core.ResourceCleaner;
 import org.eclipse.buildship.javaee.core.model.WarModel;
 
 /**
- * Configures an Eclipse Web Application project. The configurator is applied if and only if the given
- * project applies the Gradle 'war' plugin.
+ * Configures an Eclipse Web Application project. The configurator is applied if and only if the
+ * given project applies the Gradle 'war' plugin.
  *
- * This configurator implements the following steps, in this order:
- * 1. Add the Java web facet, and the Dynamic web facet.
- * 2. Remove any redundant files created by the addition of the dynamic web facet.
- * 3. Flag test dependencies as 'non-deploy' in component file.
+ * This configurator implements the following steps, in this order: 1. Add the Java web facet, and
+ * the Dynamic web facet. 2. Remove any redundant files created by the addition of the dynamic web
+ * facet. 3. Flag test dependencies as 'non-deploy' in component file.
  *
  */
 @SuppressWarnings({ "restriction" })
@@ -66,9 +73,12 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     @Override
     public IStatus configure(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) {
         MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, "", null);
+        IProject workspaceProject = configurationRequest.getWorkspaceProject();
+        OmniEclipseProject project = configurationRequest.getProject();
         try {
             configureFacets(configurationRequest, monitor, multiStatus);
             makeGradleContainerDeployable(configurationRequest, monitor);
+            removeTestFolderLinks(workspaceProject, project, monitor);
         } catch (Exception e) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
             multiStatus.add(errorStatus);
@@ -100,7 +110,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         facetedProject.modify(actions, monitor);
 
-        cleaner.clean(monitor);
+//        cleaner.clean(monitor);
     }
 
     // 'Inspired by'
@@ -123,6 +133,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IProjectFacetVersion webFacetVersion = getWebFacetVersion(project, warModel);
         String webAppDirName = warModel.getWebAppDirName();
 
+        // TODO: create only if used
         IDataModel webModelConfig = DataModelFactory.createDataModel(new WebFacetInstallDataModelProvider());
         webModelConfig.setProperty(IJ2EEModuleFacetInstallDataModelProperties.CONFIG_FOLDER, webAppDirName);
         webModelConfig.setProperty(IJ2EEModuleFacetInstallDataModelProperties.GENERATE_DD, false);
@@ -136,9 +147,9 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     }
 
     /**
-     * Reads the web facet version in from the web xml file. If no file exists,
-     * or if no web facet version has been declared, web facet version 2.5 is returned.
-     * TODO: Why are IOException and coreexception expected?
+     * Reads the web facet version in from the web xml file. If no file exists, or if no web facet
+     * version has been declared, web facet version 2.5 is returned. TODO: Why are IOException and
+     * coreexception expected?
      */
     private IProjectFacetVersion getWebFacetVersion(IProject project, WarModel warModel) {
         String webXmlName = warModel.getWebXmlName();
@@ -202,14 +213,25 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     }
 
     /**
-     * Adds the org.eclipse.jst.component.dependency attribute to the Gradle classpath container attribute.
+     * Adds the org.eclipse.jst.component.dependency attribute to the Gradle classpath container
+     * attribute.
      */
     private IClasspathEntry modifyGradleContainerEntry(IClasspathEntry entry) {
         IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute("org.eclipse.jst.component.dependency", "/WEB-INF/lib");
         List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
         gradleContainerAttributes.add(newAttribute);
-        return JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes.toArray(new IClasspathAttribute[gradleContainerAttributes.size()]), entry.isExported());
+        return JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes
+                .toArray(new IClasspathAttribute[gradleContainerAttributes.size()]), entry.isExported());
+    }
 
+    private void removeTestFolderLinks(IProject workspaceProject, OmniEclipseProject project, IProgressMonitor monitor) {
+        IVirtualComponent component = ComponentCore.createComponent(workspaceProject);
+        if (component == null) {
+            return;
+        }
+        IVirtualFolder jsrc = component.getRootFolder();
+
+        return;
     }
 
 }
