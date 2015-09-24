@@ -172,7 +172,7 @@ String getVersion(def baseVersion) {
     }
 
     // use full timestamp on CI vs. date-only for local builds
-    if (project.hasProperty('build.invoker') && project.property('build.invoker') == 'ci') {
+    if (true || (project.hasProperty('build.invoker') && project.property('build.invoker') == 'ci')) {
         // note that for Eclipse plugin versions, the '-' and '.' character are invalid in front of the build id
         baseVersion + '.v' + new Date().format('yyyyMMdd-kkmm', TimeZone.getTimeZone('GMT')) + suffix
     } else {
