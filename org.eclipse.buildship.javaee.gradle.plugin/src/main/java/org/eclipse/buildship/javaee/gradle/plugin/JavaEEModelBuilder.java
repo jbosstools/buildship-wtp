@@ -17,6 +17,7 @@ import java.util.List;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.UnknownTaskException;
+import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
 
@@ -43,7 +44,7 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
         } catch (UnknownTaskException e) {
             System.out.println("No war task.");
         }
-        return new DefaultWarModel(pluginClassNames, webAppDir, webAppDirName, webXmlPath);
+        return new DefaultWarModel(pluginClassNames, webAppDir, webAppDirName, webXmlPath, getDeps(project));
     }
 
     private static File getWebAppDir(Project project, String webAppDirName) {
@@ -54,6 +55,12 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
     private static String getWebAppDirName(Project project) {
         return !project.hasProperty("webAppDir") ? "src/main/webapp"
                 : String.valueOf(project.property("webAppDirName"));
+    }
+
+    private String getDeps(Project project) {
+        DependencyHandler dephand = project.getDependencies();
+        dephand.getComponents();
+        return project.property("dependencies").toString();
     }
 
     private static List<String> getPluginClassNames(Project project) {
@@ -74,4 +81,5 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
         }
         return webXmlPath;
     }
+
 }

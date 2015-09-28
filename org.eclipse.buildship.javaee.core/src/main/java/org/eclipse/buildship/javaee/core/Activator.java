@@ -69,6 +69,7 @@ public class Activator extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         plugin = null;
         super.stop(context);
+
         this.loggerService.unregister();
     }
 
@@ -76,8 +77,7 @@ public class Activator extends AbstractUIPlugin {
         return new EclipseLogger(getLog(), PLUGIN_ID, isDebugging());
     }
 
-    public static Activator getDefault() {
-        getLogger().error("Test Error...");
+    public static Activator getInstance() {
         return plugin;
     }
 

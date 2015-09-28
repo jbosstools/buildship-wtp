@@ -24,12 +24,14 @@ public class DefaultWarModel implements Serializable {
     private final File webAppDir;
     private final String webAppDirName;
     private final String webXml;
+    private final String deps;
 
-    public DefaultWarModel(List<String> pluginClassNames, File webAppDir, String webAppDirName, String webXml) {
+    public DefaultWarModel(List<String> pluginClassNames, File webAppDir, String webAppDirName, String webXml, String deps) {
         this.pluginClassNames = pluginClassNames;
         this.webAppDir = webAppDir;
         this.webAppDirName = webAppDirName;
         this.webXml = webXml;
+        this.deps = deps;
     }
 
     /**
@@ -49,5 +51,9 @@ public class DefaultWarModel implements Serializable {
 
     public String getWebXmlName() {
         return this.webXml;
+    }
+
+    public String getDeps() {
+        return this.deps;
     }
 }

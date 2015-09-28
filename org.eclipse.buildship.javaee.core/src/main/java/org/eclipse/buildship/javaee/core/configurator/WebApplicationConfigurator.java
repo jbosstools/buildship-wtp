@@ -8,19 +8,22 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
+
 import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
+import com.gradleware.tooling.toolingmodel.OmniEclipseProjectDependency;
+import com.gradleware.tooling.toolingmodel.OmniExternalDependency;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -45,6 +48,7 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
 import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
 import org.eclipse.buildship.core.configurator.IProjectConfigurator;
+import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
 import org.eclipse.buildship.javaee.core.Activator;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
 import org.eclipse.buildship.javaee.core.ResourceCleaner;
@@ -67,11 +71,13 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     @Override
     public boolean canConfigure(ProjectConfigurationRequest configurationRequest) {
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
+        System.out.println("Checking if war configurator can be applied...: " + ProjectAnalyzer.isWarProject(projectPath));
         return ProjectAnalyzer.isWarProject(projectPath);
     }
 
     @Override
     public IStatus configure(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) {
+        System.out.println("Web App Project Configuration Starting");
         MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, "", null);
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         OmniEclipseProject project = configurationRequest.getProject();
@@ -79,10 +85,25 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             configureFacets(configurationRequest, monitor, multiStatus);
             makeGradleContainerDeployable(configurationRequest, monitor);
             removeTestFolderLinks(workspaceProject, project, monitor);
+            getTestDependencies(configurationRequest);
         } catch (Exception e) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
             multiStatus.add(errorStatus);
         }
+        System.out.println("Web App Project Configuration Complete");
+        System.out.println("=== Classpath ===");
+        IJavaProject javaProject = JavaCore.create(workspaceProject);
+        try {
+            final List<IClasspathEntry> rawClasspath = ImmutableList.copyOf(javaProject.getRawClasspath());
+            for (IClasspathEntry classpathEntry : rawClasspath) {
+                System.out.println(classpathEntry);
+            }
+        } catch (JavaModelException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        System.out.println("=== Classpath ===");
         return multiStatus;
     }
 
@@ -99,7 +120,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
         WarModel warModel = ProjectAnalyzer.getWarModel(projectPath);
-
+        System.out.println("Deps" + warModel.getDeps());
         ResourceCleaner cleaner = new ResourceCleaner(workspaceProject, workspaceProject.getFolder(warModel.getWebAppDirName()));
         cleaner.collectWtpFolders(warModel);
 
@@ -110,7 +131,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         facetedProject.modify(actions, monitor);
 
-//        cleaner.clean(monitor);
+        cleaner.clean(monitor);
     }
 
     // 'Inspired by'
@@ -229,9 +250,38 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         if (component == null) {
             return;
         }
-        IVirtualFolder jsrc = component.getRootFolder();
+
+        IVirtualFolder jsrc = component.getRootFolder().getFolder("/");
+        try {
+            jsrc.removeLink(new Path("src/test/java"), 0, monitor);
+        } catch (CoreException e) {
+            e.printStackTrace();
+        }
 
         return;
+    }
+
+    private void getTestDependencies(ProjectConfigurationRequest configurationRequest) {
+        OmniEclipseProject project = configurationRequest.getProject();
+        IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
+        IClasspathContainer rootContainer = null;
+        try {
+            rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        } catch (JavaModelException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("___ classpath entries");
+        for (IClasspathEntry i : rootContainer.getClasspathEntries()) {
+            System.out.println("____" + i);
+        }
+
+        System.out.println("___ extern dependencies");
+        for (OmniExternalDependency i : project.getExternalDependencies()) {
+            System.out.println("____" + i.toString());
+        }
+
+
     }
 
 }

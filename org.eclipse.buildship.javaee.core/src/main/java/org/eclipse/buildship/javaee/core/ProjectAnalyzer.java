@@ -22,7 +22,7 @@ import org.eclipse.buildship.javaee.core.model.WarModel;
 
 public class ProjectAnalyzer {
 
-    private static final String INIT_FILE_PATH = Activator.getDefault().getStateLocation().append("init.gradle").toString();
+    private static final String INIT_FILE_PATH = Activator.getInstance().getStateLocation().append("init.gradle").toString();
 
     public static boolean isWarProject(String projectPath) {
         return getWarModel(projectPath).hasWarPlugin();
@@ -51,7 +51,7 @@ public class ProjectAnalyzer {
      */
     private static WarModel buildWarModel(ProjectConnection connection) {
         ModelBuilder<WarModel> customModelBuilder = connection.model(WarModel.class);
-        IPath pluginDirectory = Activator.getDefault().getStateLocation().append("repo");
+        IPath pluginDirectory = Activator.getInstance().getStateLocation().append("repo");
         customModelBuilder.withArguments("--init-script", INIT_FILE_PATH, "-DpluginDirectory=" + pluginDirectory);
         return customModelBuilder.get();
     }

@@ -25,4 +25,6 @@ public interface WarModel {
     String getWebAppDirName();
 
     String getWebXmlName();
+
+    String getDeps();
 }
