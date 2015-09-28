@@ -8,6 +8,7 @@
  * Contributors:
  *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
+
 package org.eclipse.buildship.javaee.gradle.plugin;
 
 import org.gradle.api.Project;
@@ -19,6 +20,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
+/**
+ * A model builder that builds the dependency model.
+ */
 public class DependencyModelBuilder implements ToolingModelBuilder {
 
 

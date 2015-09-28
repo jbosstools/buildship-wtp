@@ -8,16 +8,14 @@
  * Contributors:
  *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
+
 package org.eclipse.buildship.javaee.gradle.plugin;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
-import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.plugins.WarPlugin;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * The model implementation for projects that apply the 'war' plug-in.

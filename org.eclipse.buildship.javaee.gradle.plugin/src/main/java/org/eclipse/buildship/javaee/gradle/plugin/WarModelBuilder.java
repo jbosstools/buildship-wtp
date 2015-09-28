@@ -8,6 +8,7 @@
  * Contributors:
  *     Ian Stewart-Binks (Red Hat, Inc.) -
  */
+
 package org.eclipse.buildship.javaee.gradle.plugin;
 
 import java.io.File;
@@ -17,8 +18,6 @@ import java.util.List;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.UnknownTaskException;
-import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
 
