@@ -20,14 +20,23 @@ import org.eclipse.core.runtime.IPath;
 
 import org.eclipse.buildship.javaee.core.model.WarModel;
 
+/**
+ * Accesses Gradle build settings for a given project.
+ */
 public class ProjectAnalyzer {
 
     private static final String INIT_FILE_PATH = Activator.getInstance().getStateLocation().append("init.gradle").toString();
 
+    /**
+     * Determines whether the project located at projectPath is a war project.
+     */
     public static boolean isWarProject(String projectPath) {
         return getWarModel(projectPath).hasWarPlugin();
     }
 
+    /**
+     * Gets the War model of the project located at projectPath.
+     */
     public static WarModel getWarModel(String projectPath) {
         ProjectConnection connection = null;
         try {
@@ -46,6 +55,7 @@ public class ProjectAnalyzer {
         connector.forProjectDirectory(new File(projectPath));
         return connector;
     }
+
     /**
      * Builds the WarModel based on what's defined in the project's Gradle build script.
      */
