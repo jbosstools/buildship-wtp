@@ -34,28 +34,21 @@ public class DefaultDependencyModel implements Serializable {
         this.providedRuntimeDependencies = providedRuntimeDependencies;
     }
 
-    ImmutableList<String> getCompileDependencies() {
-        return this.compileDependencies;
-    };
-
-    ImmutableList<String> getRuntimeDependencies() {
-        return this.runtimeDependencies;
-    };
-
-    ImmutableList<String> getTestCompileDependencies() {
-        return this.testCompileDependencies;
-    };
-
-    ImmutableList<String> getTestRuntimeDependencies() {
-        return this.testRuntimeDependencies;
-    };
-
-    ImmutableList<String> getProvidedCompileDependencies() {
-        return this.providedCompileDependencies;
-    };
-
-    ImmutableList<String> getProvidedRuntimeDependencies() {
-        return this.providedRuntimeDependencies;
-    };
+    ImmutableList<String> getDependenciesForConfiguraion(String configuration) {
+         if (configuration == "compile") {
+             return this.compileDependencies;
+         } else if (configuration == "runtime") {
+             return this.runtimeDependencies;
+         } else if (configuration == "testCompile") {
+             return this.testCompileDependencies;
+         } else if (configuration == "testRuntime") {
+             return this.testRuntimeDependencies;
+         } else if (configuration == "providedCompile") {
+             return this.providedCompileDependencies;
+         } else if (configuration == "providedRuntime") {
+             return this.providedRuntimeDependencies;
+         }
+         return ImmutableList.of();
+    }
 
 }

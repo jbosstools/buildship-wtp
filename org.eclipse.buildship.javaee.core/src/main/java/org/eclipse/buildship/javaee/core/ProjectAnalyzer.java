@@ -19,6 +19,7 @@ import org.gradle.tooling.ProjectConnection;
 
 import org.eclipse.core.runtime.IPath;
 
+import org.eclipse.buildship.javaee.core.model.DependencyModel;
 import org.eclipse.buildship.javaee.core.model.WarModel;
 
 /**
@@ -51,6 +52,22 @@ public class ProjectAnalyzer {
 
     }
 
+    /**
+     * Gets the Dependency model of the project located at projectPath.
+     */
+    public static DependencyModel getDependencyModel(String projectPath) {
+        ProjectConnection connection = null;
+        try {
+            GradleConnector connector = initializeConnector(projectPath);
+            connection = connector.connect();
+            DependencyModel model = buildDependencyModel(connection);
+            return model;
+        } finally {
+            closeConnection(connection);
+        }
+
+    }
+
     private static GradleConnector initializeConnector(String projectPath) {
         GradleConnector connector = GradleConnector.newConnector();
         connector.forProjectDirectory(new File(projectPath));
@@ -67,10 +84,25 @@ public class ProjectAnalyzer {
         return customModelBuilder.get();
     }
 
+    /**
+     * Builds the DependencyModel based on what's defined in the project's Gradle build script.
+     */
+    private static DependencyModel buildDependencyModel(ProjectConnection connection) {
+        ModelBuilder<DependencyModel> customModelBuilder = connection.model(DependencyModel.class);
+        IPath pluginDirectory = Activator.getInstance().getStateLocation().append("repo");
+        customModelBuilder.withArguments("--init-script", INIT_FILE_PATH, "-DpluginDirectory=" + pluginDirectory);
+        return customModelBuilder.get();
+    }
+
     private static void closeConnection(ProjectConnection connection) {
         if (connection != null) {
             connection.close();
         }
+    }
+
+    private static ImmutableList<String> getDependenciesForConfiguration(String projectPath, String configuration) {
+        DependencyModel dependencyModel = getDependencyModel(projectPath);
+        return dependencyModel.getDependencyForConfiguration(configuration);
     }
 
 }
