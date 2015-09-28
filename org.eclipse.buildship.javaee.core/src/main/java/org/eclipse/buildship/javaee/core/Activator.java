@@ -55,6 +55,15 @@ public class Activator extends AbstractUIPlugin {
         copyGradlePluginFilesToMetadataFolder();
     }
 
+    @Override
+    public void stop(BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+
+        this.loggerService.unregister();
+        this.loggerServiceTracker.close();
+    }
+
     private <T> ServiceRegistration registerService(BundleContext context, Class<T> clazz, T service, Dictionary<String, Object> properties) {
         return context.registerService(clazz.getName(), service, properties);
     }
@@ -63,14 +72,6 @@ public class Activator extends AbstractUIPlugin {
         ServiceTracker serviceTracker = new ServiceTracker(context, clazz.getName(), null);
         serviceTracker.open();
         return serviceTracker;
-    }
-
-    @Override
-    public void stop(BundleContext context) throws Exception {
-        plugin = null;
-        super.stop(context);
-
-        this.loggerService.unregister();
     }
 
     private EclipseLogger createLogger() {
