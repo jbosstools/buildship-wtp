@@ -56,4 +56,5 @@ public class DefaultWarModel implements Serializable {
     public String getDeps() {
         return this.deps;
     }
+
 }
