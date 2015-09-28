@@ -11,5 +11,5 @@ Much of the update site build code has been reused from the [Buildship](https://
 
 ## License
 
-buildship-wtpis available under the Eclipse Public License, Version 1.0.
+buildship-wtp is available under the Eclipse Public License, Version 1.0.
 
