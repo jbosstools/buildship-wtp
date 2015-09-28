@@ -8,22 +8,24 @@
  * Contributors:
  *     Ian Stewart-Binks (Red Hat, Inc.) -
  */
-
 package org.eclipse.buildship.javaee.gradle.plugin;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.UnknownTaskException;
+import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
 
 /**
  * A model builder that builds the war model.
  */
-public class JavaEEModelBuilder implements ToolingModelBuilder {
+public class WarModelBuilder implements ToolingModelBuilder {
 
     @Override
     public boolean canBuild(String modelName) {
@@ -69,9 +71,8 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
         File webXml = warTask.getWebXml();
         if (webXml != null) {
             webXmlPath = webXml.getPath();
-        } else {
-            System.out.println("No web.xml file.");
         }
         return webXmlPath;
     }
+
 }

@@ -14,10 +14,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.Dictionary;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.util.tracker.ServiceTracker;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -27,12 +31,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import org.eclipse.buildship.core.Logger;
 import org.eclipse.buildship.core.util.logging.EclipseLogger;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -44,15 +42,35 @@ public class Activator extends AbstractUIPlugin {
     private ServiceRegistration loggerService;
     private ServiceTracker loggerServiceTracker;
 
+    public static Activator getInstance() {
+        return plugin;
+    }
+
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
 
         plugin = this;
+        registerServices(context);
+        copyGradlePluginFilesToMetadataFolder();
+    }
+
+    @Override
+    public void stop(BundleContext context) throws Exception {
+        plugin = null;
+        unregisterServices();
+        super.stop(context);
+
+    }
+
+    public void registerServices(BundleContext context) {
         this.loggerService = registerService(context, Logger.class, createLogger(), null);
         this.loggerServiceTracker = createServiceTracker(context, Logger.class);
+    }
 
-        copyGradlePluginFilesToMetadataFolder();
+    public void unregisterServices() {
+        this.loggerService.unregister();
+        this.loggerServiceTracker.close();
     }
 
     private <T> ServiceRegistration registerService(BundleContext context, Class<T> clazz, T service, Dictionary<String, Object> properties) {
@@ -65,20 +83,8 @@ public class Activator extends AbstractUIPlugin {
         return serviceTracker;
     }
 
-    @Override
-    public void stop(BundleContext context) throws Exception {
-        plugin = null;
-        super.stop(context);
-        this.loggerService.unregister();
-    }
-
     private EclipseLogger createLogger() {
         return new EclipseLogger(getLog(), PLUGIN_ID, isDebugging());
-    }
-
-    public static Activator getDefault() {
-        getLogger().error("Test Error...");
-        return plugin;
     }
 
     public static Logger getLogger() {
@@ -100,8 +106,8 @@ public class Activator extends AbstractUIPlugin {
         File initFile = null;
         File pluginFile = null;
 
-        System.out.println("Init URL   : " + initUrl);
-        System.out.println("Plug-in URL: " + pluginUrl);
+        getLogger().info("Init URL   : " + initUrl);
+        getLogger().info("Plug-in URL: " + pluginUrl);
         initFile = new File(FileLocator.toFileURL(initUrl).toURI());
         pluginFile = new File(FileLocator.toFileURL(pluginUrl).toURI());
 

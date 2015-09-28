@@ -27,6 +27,8 @@ dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.12'
 	compile gradleApi()
+    compile group: 'com.google.guava', name: 'guava', version: '15.0'
+    runtime group: 'com.google.guava', name: 'guava', version: '15.0'
 
     // Declare the dependency for your favourite test framework you want to use in your tests.
     // TestNG is also supported by the Gradle Test task. Just change the

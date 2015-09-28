@@ -10,21 +10,10 @@
  */
 package org.eclipse.buildship.javaee.core.model;
 
-import java.io.File;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
-/**
- * The interface used to interact with the Gradle War model. Values pulled from the War model will
- * be values directly declared in a project's build.gradle file.
- */
-public interface WarModel {
+public interface DependencyModel {
 
-    boolean hasWarPlugin();
-
-    File getWebAppDir();
-
-    String getWebAppDirName();
-
-    String getWebXmlName();
+    ImmutableList<String> getDependencyForConfiguration(String configuration);
 
 }

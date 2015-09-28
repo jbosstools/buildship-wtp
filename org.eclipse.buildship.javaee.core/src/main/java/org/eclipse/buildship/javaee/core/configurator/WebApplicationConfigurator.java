@@ -8,19 +8,22 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
+
 import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
+import com.gradleware.tooling.toolingmodel.OmniExternalDependency;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -45,6 +48,7 @@ import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
 import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
 import org.eclipse.buildship.core.configurator.IProjectConfigurator;
+import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
 import org.eclipse.buildship.javaee.core.Activator;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
 import org.eclipse.buildship.javaee.core.ResourceCleaner;
@@ -54,9 +58,10 @@ import org.eclipse.buildship.javaee.core.model.WarModel;
  * Configures an Eclipse Web Application project. The configurator is applied if and only if the
  * given project applies the Gradle 'war' plugin.
  *
- * This configurator implements the following steps, in this order: 1. Add the Java web facet, and
- * the Dynamic web facet. 2. Remove any redundant files created by the addition of the dynamic web
- * facet. 3. Flag test dependencies as 'non-deploy' in component file.
+ * This configurator implements the following steps, in this order:
+ * 1. Add the Java web facet, and the Dynamic web facet.
+ * 2. Remove any redundant files created by the addition of the dynamic web facet.
+ * 3. Flag test dependencies as 'non-deploy' in component file.
  *
  */
 @SuppressWarnings({ "restriction" })
@@ -67,11 +72,13 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     @Override
     public boolean canConfigure(ProjectConfigurationRequest configurationRequest) {
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
+        Activator.getLogger().info("Checking if war configurator can be applied...: " + ProjectAnalyzer.isWarProject(projectPath));
         return ProjectAnalyzer.isWarProject(projectPath);
     }
 
     @Override
     public IStatus configure(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) {
+        System.out.println("Web App Project Configuration Starting");
         MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, "", null);
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         OmniEclipseProject project = configurationRequest.getProject();
@@ -79,6 +86,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             configureFacets(configurationRequest, monitor, multiStatus);
             makeGradleContainerDeployable(configurationRequest, monitor);
             removeTestFolderLinks(workspaceProject, project, monitor);
+            getTestDependencies(configurationRequest);
         } catch (Exception e) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
             multiStatus.add(errorStatus);
@@ -99,7 +107,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
         WarModel warModel = ProjectAnalyzer.getWarModel(projectPath);
-
         ResourceCleaner cleaner = new ResourceCleaner(workspaceProject, workspaceProject.getFolder(warModel.getWebAppDirName()));
         cleaner.collectWtpFolders(warModel);
 
@@ -110,7 +117,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         facetedProject.modify(actions, monitor);
 
-//        cleaner.clean(monitor);
+        cleaner.clean(monitor);
     }
 
     // 'Inspired by'
@@ -196,18 +203,20 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IProject workspaceProject = projectConfigurationRequest.getWorkspaceProject();
         IJavaProject javaProject = JavaCore.create(workspaceProject);
 
-        IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
-        ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+        List<IClasspathEntry> classpathEntries = Arrays.asList(javaProject.getRawClasspath());
+        List<IClasspathEntry> newEntries = FluentIterable.from(classpathEntries).transform(new Function<IClasspathEntry, IClasspathEntry>() {
 
-        for (IClasspathEntry entry : classpathEntries) {
-            String path = entry.getPath().toString();
-            if (path.equals(GRADLE_CLASSPATH_CONTAINER_PATH)) {
-                IClasspathEntry newGradleContainerEntry = modifyGradleContainerEntry(entry);
-                newEntries.add(newGradleContainerEntry);
-            } else {
-                newEntries.add(entry);
+            @Override
+            public IClasspathEntry apply(IClasspathEntry entry) {
+                String path = entry.getPath().toString();
+                if (path.equals(GRADLE_CLASSPATH_CONTAINER_PATH)) {
+                    IClasspathEntry newGradleContainerEntry = modifyGradleContainerEntry(entry);
+                    return newGradleContainerEntry;
+                } else {
+                    return entry;
+                }
             }
-        }
+        }).toList();
 
         javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
     }
@@ -229,9 +238,39 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         if (component == null) {
             return;
         }
-        IVirtualFolder jsrc = component.getRootFolder();
+
+        IVirtualFolder jsrc = component.getRootFolder().getFolder("/");
+        try {
+            jsrc.removeLink(new Path("src/test/java"), 0, monitor);
+        } catch (CoreException e) {
+            // Should be returned in Istatus.
+            Activator.getLogger().error(e.getMessage(), e);
+        }
 
         return;
+    }
+
+    private void getTestDependencies(ProjectConfigurationRequest configurationRequest) {
+        OmniEclipseProject project = configurationRequest.getProject();
+        IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
+        IClasspathContainer rootContainer = null;
+        try {
+            rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        } catch (JavaModelException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("___ classpath entries");
+        for (IClasspathEntry i : rootContainer.getClasspathEntries()) {
+            System.out.println("____" + i);
+        }
+
+        System.out.println("___ extern dependencies");
+        for (OmniExternalDependency i : project.getExternalDependencies()) {
+            System.out.println("____" + i.toString());
+        }
+
+
     }
 
 }
