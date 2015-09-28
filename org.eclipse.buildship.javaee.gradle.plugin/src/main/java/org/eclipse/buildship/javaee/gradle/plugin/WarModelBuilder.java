@@ -8,7 +8,6 @@
  * Contributors:
  *     Ian Stewart-Binks (Red Hat, Inc.) -
  */
-
 package org.eclipse.buildship.javaee.gradle.plugin;
 
 import java.io.File;
