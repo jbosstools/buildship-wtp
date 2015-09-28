@@ -8,10 +8,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 
 import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
-import com.gradleware.tooling.toolingmodel.OmniEclipseProjectDependency;
 import com.gradleware.tooling.toolingmodel.OmniExternalDependency;
 
 import org.eclipse.core.resources.IFile;
@@ -204,18 +204,20 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IProject workspaceProject = projectConfigurationRequest.getWorkspaceProject();
         IJavaProject javaProject = JavaCore.create(workspaceProject);
 
-        IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
-        ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+        List<IClasspathEntry> classpathEntries = Arrays.asList(javaProject.getRawClasspath());
+        List<IClasspathEntry> newEntries = FluentIterable.from(classpathEntries).transform(new Function<IClasspathEntry, IClasspathEntry>() {
 
-        for (IClasspathEntry entry : classpathEntries) {
-            String path = entry.getPath().toString();
-            if (path.equals(GRADLE_CLASSPATH_CONTAINER_PATH)) {
-                IClasspathEntry newGradleContainerEntry = modifyGradleContainerEntry(entry);
-                newEntries.add(newGradleContainerEntry);
-            } else {
-                newEntries.add(entry);
+            @Override
+            public IClasspathEntry apply(IClasspathEntry entry) {
+                String path = entry.getPath().toString();
+                if (path.equals(GRADLE_CLASSPATH_CONTAINER_PATH)) {
+                    IClasspathEntry newGradleContainerEntry = modifyGradleContainerEntry(entry);
+                    return newGradleContainerEntry;
+                } else {
+                    return entry;
+                }
             }
-        }
+        }).toList();
 
         javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
     }
