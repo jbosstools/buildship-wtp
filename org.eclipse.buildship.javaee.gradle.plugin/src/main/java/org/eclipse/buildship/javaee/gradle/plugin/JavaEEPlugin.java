@@ -30,6 +30,7 @@ public class JavaEEPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        this.registry.register(new JavaEEModelBuilder());
+        this.registry.register(new WarModelBuilder());
+        this.registry.register(new DependencyModelBuilder());
     }
 }

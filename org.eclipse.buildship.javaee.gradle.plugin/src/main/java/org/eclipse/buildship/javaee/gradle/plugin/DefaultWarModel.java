@@ -13,7 +13,11 @@ package org.eclipse.buildship.javaee.gradle.plugin;
 import java.io.File;
 import java.io.Serializable;
 import java.util.List;
+
+import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.plugins.WarPlugin;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * The model implementation for projects that apply the 'war' plug-in.
@@ -24,14 +28,12 @@ public class DefaultWarModel implements Serializable {
     private final File webAppDir;
     private final String webAppDirName;
     private final String webXml;
-    private final String deps;
 
-    public DefaultWarModel(List<String> pluginClassNames, File webAppDir, String webAppDirName, String webXml, String deps) {
+    public DefaultWarModel(List<String> pluginClassNames, File webAppDir, String webAppDirName, String webXml) {
         this.pluginClassNames = pluginClassNames;
         this.webAppDir = webAppDir;
         this.webAppDirName = webAppDirName;
         this.webXml = webXml;
-        this.deps = deps;
     }
 
     /**
@@ -51,10 +53,6 @@ public class DefaultWarModel implements Serializable {
 
     public String getWebXmlName() {
         return this.webXml;
-    }
-
-    public String getDeps() {
-        return this.deps;
     }
 
 }

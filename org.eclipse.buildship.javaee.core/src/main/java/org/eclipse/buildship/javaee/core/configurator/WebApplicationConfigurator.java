@@ -107,7 +107,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
         WarModel warModel = ProjectAnalyzer.getWarModel(projectPath);
-        System.out.println("Deps" + warModel.getDeps());
         ResourceCleaner cleaner = new ResourceCleaner(workspaceProject, workspaceProject.getFolder(warModel.getWebAppDirName()));
         cleaner.collectWtpFolders(warModel);
 

@@ -11,6 +11,7 @@
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
+import java.util.List;
 
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;

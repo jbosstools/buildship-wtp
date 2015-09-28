@@ -11,6 +11,7 @@
 package org.eclipse.buildship.javaee.core.model;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * The interface used to interact with the Gradle War model. Values pulled from the War model will
@@ -26,5 +27,4 @@ public interface WarModel {
 
     String getWebXmlName();
 
-    String getDeps();
 }

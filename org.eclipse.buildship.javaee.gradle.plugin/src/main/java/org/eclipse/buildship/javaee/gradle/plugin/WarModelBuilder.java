@@ -14,17 +14,19 @@ package org.eclipse.buildship.javaee.gradle.plugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.UnknownTaskException;
-import org.gradle.api.artifacts.dsl.DependencyHandler;
+import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
 
 /**
  * A model builder that builds the war model.
  */
-public class JavaEEModelBuilder implements ToolingModelBuilder {
+public class WarModelBuilder implements ToolingModelBuilder {
 
     @Override
     public boolean canBuild(String modelName) {
@@ -44,7 +46,7 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
         } catch (UnknownTaskException e) {
             System.out.println("No war task.");
         }
-        return new DefaultWarModel(pluginClassNames, webAppDir, webAppDirName, webXmlPath, getDeps(project));
+        return new DefaultWarModel(pluginClassNames, webAppDir, webAppDirName, webXmlPath);
     }
 
     private static File getWebAppDir(Project project, String webAppDirName) {
@@ -55,12 +57,6 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
     private static String getWebAppDirName(Project project) {
         return !project.hasProperty("webAppDir") ? "src/main/webapp"
                 : String.valueOf(project.property("webAppDirName"));
-    }
-
-    private String getDeps(Project project) {
-        DependencyHandler dephand = project.getDependencies();
-        dephand.getComponents();
-        return project.property("dependencies").toString();
     }
 
     private static List<String> getPluginClassNames(Project project) {
