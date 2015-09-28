@@ -1,4 +1,4 @@
-# buildship-javaee
+# buildship-wtp
 
 This project is meant to host a prototype of WTP integration with the Buildship project.
 
@@ -11,5 +11,5 @@ Much of the update site build code has been reused from the [Buildship](https://
 
 ## License
 
-Buildship-JavaEE is available under the Eclipse Public License, Version 1.0.
+buildship-wtpis available under the Eclipse Public License, Version 1.0.
 
