@@ -6,8 +6,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
+ *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
+
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
@@ -33,7 +34,7 @@ import org.eclipse.buildship.core.Logger;
 import org.eclipse.buildship.core.util.logging.EclipseLogger;
 
 /**
- * The activator class controls the plug-in life cycle
+ * The activator class controls the plug-in life cycle.
  */
 public class Activator extends AbstractUIPlugin {
 
@@ -116,7 +117,7 @@ public class Activator extends AbstractUIPlugin {
     }
 
     /**
-     * Returns an image descriptor for the image file at the given plug-in relative path
+     * Returns an image descriptor for the image file at the given plug-in relative path.
      */
     public static ImageDescriptor getImageDescriptor(String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);

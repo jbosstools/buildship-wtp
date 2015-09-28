@@ -6,12 +6,16 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
+ *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
+
 package org.eclipse.buildship.javaee.core.model;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * Used to interact with a project's dependencies.
+ */
 public interface DependencyModel {
 
     ImmutableList<String> getDependencyForConfiguration(String configuration);

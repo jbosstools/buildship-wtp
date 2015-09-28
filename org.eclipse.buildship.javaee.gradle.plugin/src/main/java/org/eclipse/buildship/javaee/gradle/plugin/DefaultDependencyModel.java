@@ -8,12 +8,16 @@
  * Contributors:
  *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
+
 package org.eclipse.buildship.javaee.gradle.plugin;
 
 import java.io.Serializable;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * Implementation of the DependencyModel.
+ */
 public class DefaultDependencyModel implements Serializable {
 
     private static final long serialVersionUID = -8931280253307342724L;

@@ -8,14 +8,16 @@
  * Contributors:
  *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
+
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
-import java.util.List;
 
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
+
+import com.google.common.collect.ImmutableList;
 
 import org.eclipse.core.runtime.IPath;
 

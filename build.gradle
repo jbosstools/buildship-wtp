@@ -122,15 +122,15 @@ subprojects {
     }
 
     // apply Checkstyle plugin, mainly to ensure license/copyright and javadoc is present
-//    apply plugin: 'checkstyle'
-//
-//    // share checkstyle config across all sub-projects
-//    def checkstyleConfigDir = "$rootDir/gradle/config/checkstyle"
-//    tasks.withType(Checkstyle).all {
-//      configFile = "$checkstyleConfigDir/checkstyle.xml" as File
-//      configProperties = ['checkstyleConfigDir': checkstyleConfigDir]
-//      inputs.file "$checkstyleConfigDir/suppressions.xml" as File
-//    }
+    apply plugin: 'checkstyle'
+
+    // share checkstyle config across all sub-projects
+    def checkstyleConfigDir = "$rootDir/gradle/config/checkstyle"
+    tasks.withType(Checkstyle).all {
+      configFile = "$checkstyleConfigDir/checkstyle.xml" as File
+      configProperties = ['checkstyleConfigDir': checkstyleConfigDir]
+      inputs.file "$checkstyleConfigDir/suppressions.xml" as File
+    }
 
     // configure the repositories where the external dependencies can be found
     repositories {
