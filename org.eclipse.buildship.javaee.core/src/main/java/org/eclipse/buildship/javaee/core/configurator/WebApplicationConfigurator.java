@@ -58,9 +58,10 @@ import org.eclipse.buildship.javaee.core.model.WarModel;
  * Configures an Eclipse Web Application project. The configurator is applied if and only if the
  * given project applies the Gradle 'war' plugin.
  *
- * This configurator implements the following steps, in this order: 1. Add the Java web facet, and
- * the Dynamic web facet. 2. Remove any redundant files created by the addition of the dynamic web
- * facet. 3. Flag test dependencies as 'non-deploy' in component file.
+ * This configurator implements the following steps, in this order:
+ * 1. Add the Java web facet, and the Dynamic web facet.
+ * 2. Remove any redundant files created by the addition of the dynamic web facet.
+ * 3. Flag test dependencies as 'non-deploy' in component file.
  *
  */
 @SuppressWarnings({ "restriction" })
@@ -241,7 +242,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         try {
             jsrc.removeLink(new Path("src/test/java"), 0, monitor);
         } catch (CoreException e) {
-            e.printStackTrace();
+            // Should be returned in Istatus.
+            Activator.getLogger().error(e.getMessage(), e);
         }
 
         return;
