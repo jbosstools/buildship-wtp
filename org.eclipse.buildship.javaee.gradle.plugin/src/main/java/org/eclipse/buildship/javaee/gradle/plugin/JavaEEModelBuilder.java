@@ -76,8 +76,6 @@ public class JavaEEModelBuilder implements ToolingModelBuilder {
         File webXml = warTask.getWebXml();
         if (webXml != null) {
             webXmlPath = webXml.getPath();
-        } else {
-            System.out.println("No web.xml file.");
         }
         return webXmlPath;
     }

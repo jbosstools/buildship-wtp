@@ -71,7 +71,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     @Override
     public boolean canConfigure(ProjectConfigurationRequest configurationRequest) {
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
-        System.out.println("Checking if war configurator can be applied...: " + ProjectAnalyzer.isWarProject(projectPath));
+        Activator.getLogger().info("Checking if war configurator can be applied...: " + ProjectAnalyzer.isWarProject(projectPath));
         return ProjectAnalyzer.isWarProject(projectPath);
     }
 
@@ -90,20 +90,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
             multiStatus.add(errorStatus);
         }
-        System.out.println("Web App Project Configuration Complete");
-        System.out.println("=== Classpath ===");
-        IJavaProject javaProject = JavaCore.create(workspaceProject);
-        try {
-            final List<IClasspathEntry> rawClasspath = ImmutableList.copyOf(javaProject.getRawClasspath());
-            for (IClasspathEntry classpathEntry : rawClasspath) {
-                System.out.println(classpathEntry);
-            }
-        } catch (JavaModelException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-        System.out.println("=== Classpath ===");
         return multiStatus;
     }
 
