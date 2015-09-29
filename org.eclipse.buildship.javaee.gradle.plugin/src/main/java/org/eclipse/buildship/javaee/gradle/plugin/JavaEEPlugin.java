@@ -17,15 +17,17 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.tooling.provider.model.ToolingModelBuilderRegistry;
 
+import org.eclipse.buildship.javaee.gradle.plugin.model.builder.DependencyModelBuilder;
+import org.eclipse.buildship.javaee.gradle.plugin.model.builder.WarModelBuilder;
+
 /**
- * A Gradle plugin that registers all model builders.
+ * A Gradle plug-in that registers all model builders.
  */
 public class JavaEEPlugin implements Plugin<Project> {
     private final ToolingModelBuilderRegistry registry;
 
     @Inject
     public JavaEEPlugin(ToolingModelBuilderRegistry registry) {
-        System.out.println(">> PLUGIN");
         this.registry = registry;
     }
 

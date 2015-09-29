@@ -7,6 +7,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
-	<classpathentry kind="lib" path="/home/istewart/.gradle/wrapper/dists/gradle-2.5-rc-2-bin/434v72vrqzww62lskhms3x5g/gradle-2.5-rc-2/lib/guava-jdk5-17.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.buildship.javaee.core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

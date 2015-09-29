@@ -9,7 +9,7 @@
  *     Ian Stewart-Binks (Red Hat, Inc.) -
  */
 
-package org.eclipse.buildship.javaee.gradle.plugin;
+package org.eclipse.buildship.javaee.gradle.plugin.model.builder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +21,8 @@ import org.gradle.api.UnknownTaskException;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
 
+import org.eclipse.buildship.javaee.gradle.plugin.model.DefaultWarModel;
+
 /**
  * A model builder that builds the war model.
  */
@@ -29,6 +31,7 @@ public class WarModelBuilder implements ToolingModelBuilder {
     @Override
     public boolean canBuild(String modelName) {
         //TODO: Check to see if there is an alternative to hardcoding the name in here.
+        System.out.println("+++ ??? " + System.getProperty("java.class.path"));
         return modelName.equals("org.eclipse.buildship.javaee.core.model.WarModel");
     }
 

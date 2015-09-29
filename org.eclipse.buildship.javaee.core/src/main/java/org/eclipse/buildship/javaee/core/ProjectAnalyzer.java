@@ -12,12 +12,11 @@
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
+import java.util.List;
 
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
-
-import com.google.common.collect.ImmutableList;
 
 import org.eclipse.core.runtime.IPath;
 
@@ -102,9 +101,12 @@ public class ProjectAnalyzer {
         }
     }
 
-    private static ImmutableList<String> getDependenciesForConfiguration(String projectPath, String configuration) {
+    public static List<OmniGradleDep> getDependenciesForConfiguration(String projectPath, String configuration) {
         DependencyModel dependencyModel = getDependencyModel(projectPath);
-        return dependencyModel.getDependencyForConfiguration(configuration);
+        System.out.println("Retrieved gependency model");
+        List<OmniGradleDep> dp = dependencyModel.getDependenciesForConfiguration(configuration);
+        System.out.println("Got DPS");
+        return dp;
     }
 
 }
