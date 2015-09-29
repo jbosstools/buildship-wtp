@@ -12,14 +12,10 @@
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
-import org.apache.commons.io.FileUtils;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URL;
-import java.nio.channels.FileChannel;
 import java.util.Dictionary;
 
+import org.apache.commons.io.FileUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -28,7 +24,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import org.eclipse.buildship.core.Logger;
@@ -117,44 +112,10 @@ public class Activator extends AbstractUIPlugin {
         File repoFile = new File(FileLocator.toFileURL(repoUrl).toURI());
         File guavaFile = new File(FileLocator.toFileURL(guavaUrl).toURI());
 
-        copyFile(initFile, new File(initGradlePath.toString()));
-        copyFile(pluginFile, new File(pluginPath.toString()));
-        copyFile(guavaFile, new File(guavaPath.toString()));
+        FileUtils.copyFile(initFile, new File(initGradlePath.toString()));
+        FileUtils.copyFile(pluginFile, new File(pluginPath.toString()));
+        FileUtils.copyFile(guavaFile, new File(guavaPath.toString()));
         FileUtils.copyDirectory(repoFile, new File(repoPath.toString()));
-    }
-
-    /**
-     * Returns an image descriptor for the image file at the given plug-in relative path.
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
-
-    @SuppressWarnings("resource")
-    /**
-     * Copies the contents of sourceFile into destFile. Creates destFile if it does not yet exist.
-     */
-    public static void copyFile(File sourceFile, File destFile) throws IOException {
-        if (!destFile.exists()) {
-            destFile.getParentFile().mkdirs();
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-
-        try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-        }
     }
 
 }
