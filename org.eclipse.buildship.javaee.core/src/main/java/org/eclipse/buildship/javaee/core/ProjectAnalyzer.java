@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IPath;
 
 import org.eclipse.buildship.javaee.core.model.DependencyModel;
 import org.eclipse.buildship.javaee.core.model.WarModel;
+import org.eclipse.buildship.javaee.gradle.plugin.GradleDependency;
 
 /**
  * Accesses Gradle build settings for a given project.
@@ -102,7 +103,7 @@ public class ProjectAnalyzer {
         }
     }
 
-    private static ImmutableList<String> getDependenciesForConfiguration(String projectPath, String configuration) {
+    private static ImmutableList<GradleDependency> getDependenciesForConfiguration(String projectPath, String configuration) {
         DependencyModel dependencyModel = getDependencyModel(projectPath);
         return dependencyModel.getDependencyForConfiguration(configuration);
     }

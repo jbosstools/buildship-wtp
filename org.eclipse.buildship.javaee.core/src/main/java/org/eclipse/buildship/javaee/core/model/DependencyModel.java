@@ -13,11 +13,13 @@ package org.eclipse.buildship.javaee.core.model;
 
 import com.google.common.collect.ImmutableList;
 
+import org.eclipse.buildship.javaee.gradle.plugin.GradleDependency;
+
 /**
  * Used to interact with a project's dependencies.
  */
 public interface DependencyModel {
 
-    ImmutableList<String> getDependencyForConfiguration(String configuration);
+    ImmutableList<GradleDependency> getDependencyForConfiguration(String configuration);
 
 }
