@@ -12,10 +12,11 @@
 package org.eclipse.buildship.javaee.gradle.plugin.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-
-import org.eclipse.buildship.javaee.gradle.plugin.GradleDependency;
+import org.eclipse.buildship.javaee.core.GradleDependency;
+import org.eclipse.buildship.javaee.core.OmniGradleDep;
 
 /**
  * Implementation of the DependencyModel.
@@ -23,16 +24,16 @@ import org.eclipse.buildship.javaee.gradle.plugin.GradleDependency;
 public class DefaultDependencyModel implements Serializable {
 
     private static final long serialVersionUID = -8931280253307342724L;
-    private final ImmutableList<GradleDependency> compileDependencies;
-    private final ImmutableList<GradleDependency> runtimeDependencies;
-    private final ImmutableList<GradleDependency> testCompileDependencies;
-    private final ImmutableList<GradleDependency> testRuntimeDependencies;
-    private final ImmutableList<GradleDependency> providedCompileDependencies;
-    private final ImmutableList<GradleDependency> providedRuntimeDependencies;
+    private final List<OmniGradleDep> compileDependencies;
+    private final List<OmniGradleDep> runtimeDependencies;
+    private final List<OmniGradleDep> testCompileDependencies;
+    private final List<OmniGradleDep> testRuntimeDependencies;
+    private final List<OmniGradleDep> providedCompileDependencies;
+    private final List<OmniGradleDep> providedRuntimeDependencies;
 
-    public DefaultDependencyModel(ImmutableList<GradleDependency> compileDependencies, ImmutableList<GradleDependency> runtimeDependencies,
-            ImmutableList<GradleDependency> testCompileDependencies, ImmutableList<GradleDependency> testRuntimeDependencies,
-            ImmutableList<GradleDependency> providedCompileDependencies, ImmutableList<GradleDependency> providedRuntimeDependencies) {
+    public DefaultDependencyModel(List<OmniGradleDep> compileDependencies, List<OmniGradleDep> runtimeDependencies,
+            List<OmniGradleDep> testCompileDependencies, List<OmniGradleDep> testRuntimeDependencies,
+            List<OmniGradleDep> providedCompileDependencies, List<OmniGradleDep> providedRuntimeDependencies) {
         this.compileDependencies = compileDependencies;
         this.runtimeDependencies = runtimeDependencies;
         this.testCompileDependencies = testCompileDependencies;
@@ -41,7 +42,7 @@ public class DefaultDependencyModel implements Serializable {
         this.providedRuntimeDependencies = providedRuntimeDependencies;
     }
 
-    ImmutableList<GradleDependency> getDependenciesForConfiguraion(String configuration) {
+    public List<OmniGradleDep> getDependenciesForConfiguration(String configuration) {
         if (configuration == "compile") {
             return this.compileDependencies;
         } else if (configuration == "runtime") {
@@ -55,7 +56,7 @@ public class DefaultDependencyModel implements Serializable {
         } else if (configuration == "providedRuntime") {
             return this.providedRuntimeDependencies;
         }
-        return ImmutableList.of();
+        return new ArrayList<OmniGradleDep>();
     }
 
 }

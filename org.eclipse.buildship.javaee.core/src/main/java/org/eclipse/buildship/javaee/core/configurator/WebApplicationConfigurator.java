@@ -61,6 +61,7 @@ import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
 import org.eclipse.buildship.core.configurator.IProjectConfigurator;
 import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
 import org.eclipse.buildship.javaee.core.Activator;
+import org.eclipse.buildship.javaee.core.OmniGradleDep;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
 import org.eclipse.buildship.javaee.core.ResourceCleaner;
 import org.eclipse.buildship.javaee.core.model.WarModel;
@@ -99,6 +100,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             removeTestFolderLinks(workspaceProject, project, monitor);
             getTestDependencies(configurationRequest);
         } catch (Exception e) {
+            e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
             multiStatus.add(errorStatus);
         }
@@ -262,13 +264,23 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     }
 
     private void getTestDependencies(ProjectConfigurationRequest configurationRequest) {
+        System.out.println(">>> getTestDependencies");
         OmniEclipseProject project = configurationRequest.getProject();
         IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
         IClasspathContainer rootContainer = null;
+        String projectPath = configurationRequest.getProjectPath();
         try {
             rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
         } catch (JavaModelException e) {
             e.printStackTrace();
+        }
+
+        System.out.println("disect 1");
+        List<OmniGradleDep> comp = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "compile");
+
+        System.out.println("disect 2");
+        for (OmniGradleDep dep : comp) {
+            System.out.println("dep name: " + dep.getName());
         }
 
         System.out.println("___ classpath entries");
@@ -282,6 +294,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         }
 
 
+        System.out.println("<<< getTestDependencies");
     }
 
 }

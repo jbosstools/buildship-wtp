@@ -7,5 +7,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.buildship.javaee.core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

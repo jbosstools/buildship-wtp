@@ -11,6 +11,8 @@
 
 package org.eclipse.buildship.javaee.gradle.plugin.model.builder;
 
+import java.util.List;
+
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
@@ -18,9 +20,9 @@ import org.gradle.tooling.provider.model.ToolingModelBuilder;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 
-import org.eclipse.buildship.javaee.gradle.plugin.GradleDependency;
+import org.eclipse.buildship.javaee.core.GradleDependency;
+import org.eclipse.buildship.javaee.core.OmniGradleDep;
 import org.eclipse.buildship.javaee.gradle.plugin.model.DefaultDependencyModel;
 
 /**
@@ -35,24 +37,24 @@ public class DependencyModelBuilder implements ToolingModelBuilder {
 
     @Override
     public Object buildAll(String modelName, Project project) {
-        ImmutableList<GradleDependency> compileDependencies = getDependenciesForConfiguration(project, "compile");
-        ImmutableList<GradleDependency> runtimeDependencies = getDependenciesForConfiguration(project, "runtime");
-        ImmutableList<GradleDependency> testCompileDependencies = getDependenciesForConfiguration(project, "testCompile");
-        ImmutableList<GradleDependency> testRuntimeDependencies = getDependenciesForConfiguration(project, "testRuntime");
-        ImmutableList<GradleDependency> providedCompileDependencies = getDependenciesForConfiguration(project, "providedCompile");
-        ImmutableList<GradleDependency> providedRuntimeDependencies = getDependenciesForConfiguration(project, "providedRuntime");
+        List<OmniGradleDep> compileDependencies = getDependenciesForConfiguration(project, "compile");
+        List<OmniGradleDep> runtimeDependencies = getDependenciesForConfiguration(project, "runtime");
+        List<OmniGradleDep> testCompileDependencies = getDependenciesForConfiguration(project, "testCompile");
+        List<OmniGradleDep> testRuntimeDependencies = getDependenciesForConfiguration(project, "testRuntime");
+        List<OmniGradleDep> providedCompileDependencies = getDependenciesForConfiguration(project, "providedCompile");
+        List<OmniGradleDep> providedRuntimeDependencies = getDependenciesForConfiguration(project, "providedRuntime");
 
         return new DefaultDependencyModel(compileDependencies, runtimeDependencies, testCompileDependencies, testRuntimeDependencies, providedCompileDependencies,
                 providedRuntimeDependencies);
     }
 
-    private ImmutableList<GradleDependency> getDependenciesForConfiguration(Project project, String configuration) {
+    private List<OmniGradleDep> getDependenciesForConfiguration(Project project, String configuration) {
         DependencySet dependencies = project.getConfigurations().getByName(configuration).getAllDependencies();
 
-        return FluentIterable.from(dependencies).transform(new Function<Dependency, GradleDependency>() {
+        return FluentIterable.from(dependencies).transform(new Function<Dependency, OmniGradleDep>() {
 
             @Override
-            public GradleDependency apply(Dependency dependency) {
+            public OmniGradleDep apply(Dependency dependency) {
                 return new GradleDependency(dependency.getName(), dependency.getGroup(), dependency.getVersion());
 
             }
