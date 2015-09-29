@@ -5,12 +5,11 @@ version = '1.0'
 buildDir = '../org.eclipse.buildship.javaee.core/repo'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.12'
 	compile gradleApi()
-    runtime group: 'com.google.guava', name: 'guava', version: '18.0'
     testCompile 'junit:junit:4.12'
 }

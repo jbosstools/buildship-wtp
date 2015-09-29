@@ -6,7 +6,9 @@ initscript {
     }
 
     dependencies {
-        classpath name: 'redhat-plugin-1.0'
+        classpath name: 'redhat-plugin-1.0'    
+        classpath 'com.google.guava:guava:15.0'
+
     }
 }
 

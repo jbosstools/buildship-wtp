@@ -12,6 +12,7 @@
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
+import org.apache.commons.io.FileUtils;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -100,20 +101,26 @@ public class Activator extends AbstractUIPlugin {
         IPath metadataPath = this.getStateLocation();
         IPath initGradlePath = metadataPath.append("init.gradle");
         IPath pluginPath = metadataPath.append("repo").append("redhat-plugin-1.0.jar");
+        IPath repoPath = metadataPath.append("repo");
+        IPath guavaPath = metadataPath.append("repo").append("guava-15.0.jar");
 
         Bundle bundle = Platform.getBundle(PLUGIN_ID);
         URL initUrl = bundle.getEntry("init.gradle");
         URL pluginUrl = bundle.getEntry("/repo/libs/redhat-plugin-1.0.jar");
-        File initFile = null;
-        File pluginFile = null;
+        URL repoUrl = bundle.getEntry("/repo/");
+        URL guavaUrl = bundle.getEntry("/lib/guava-15.0.jar");
 
         getLogger().info("Init URL   : " + initUrl);
         getLogger().info("Plug-in URL: " + pluginUrl);
-        initFile = new File(FileLocator.toFileURL(initUrl).toURI());
-        pluginFile = new File(FileLocator.toFileURL(pluginUrl).toURI());
+        File initFile = new File(FileLocator.toFileURL(initUrl).toURI());
+        File pluginFile = new File(FileLocator.toFileURL(pluginUrl).toURI());
+        File repoFile = new File(FileLocator.toFileURL(repoUrl).toURI());
+        File guavaFile = new File(FileLocator.toFileURL(guavaUrl).toURI());
 
         copyFile(initFile, new File(initGradlePath.toString()));
         copyFile(pluginFile, new File(pluginPath.toString()));
+        copyFile(guavaFile, new File(guavaPath.toString()));
+        FileUtils.copyDirectory(repoFile, new File(repoPath.toString()));
     }
 
     /**

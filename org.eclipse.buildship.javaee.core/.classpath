@@ -9,5 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="lib" path="repo/libs/redhat-plugin-1.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.buildship.javaee.gradle.plugin"/>
+	<classpathentry kind="lib" path="/home/istewart/buildship-javaee/org.eclipse.buildship.javaee.core/lib/commons-io-2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

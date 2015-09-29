@@ -82,13 +82,14 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
     @Override
     public boolean canConfigure(ProjectConfigurationRequest configurationRequest) {
-        String projectPath = configurationRequest.getProjectPath();
-        Activator.getLogger().info("Checking if War configurator can be applied to project: " + ProjectAnalyzer.isWarProject(projectPath));
+        String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
+        Activator.getLogger().info("Checking if war configurator can be applied...: " + ProjectAnalyzer.isWarProject(projectPath));
         return ProjectAnalyzer.isWarProject(projectPath);
     }
 
     @Override
     public IStatus configure(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) {
+        System.out.println("Web App Project Configuration Starting");
         MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, "", null);
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         OmniEclipseProject project = configurationRequest.getProject();
@@ -115,7 +116,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     private void configureFacets(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor, MultiStatus multiStatus) throws Exception {
         Set<Action> actions = new LinkedHashSet<Action>();
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
-        String projectPath = configurationRequest.getProjectPath();
+        String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
         WarModel warModel = ProjectAnalyzer.getWarModel(projectPath);
         ResourceCleaner cleaner = new ResourceCleaner(workspaceProject, workspaceProject.getFolder(warModel.getWebAppDirName()));
         cleaner.collectWtpFolders(warModel);
@@ -279,6 +280,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         for (OmniExternalDependency i : project.getExternalDependencies()) {
             System.out.println("____" + i.toString());
         }
+
+
     }
 
 }
