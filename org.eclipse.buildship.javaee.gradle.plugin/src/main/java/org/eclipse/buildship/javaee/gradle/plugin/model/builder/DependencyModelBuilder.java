@@ -9,7 +9,7 @@
  *     Ian Stewart-Binks (Red Hat, Inc.) - initial API and implementation and initial documentation
  */
 
-package org.eclipse.buildship.javaee.gradle.plugin;
+package org.eclipse.buildship.javaee.gradle.plugin.model.builder;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Dependency;
@@ -19,6 +19,8 @@ import org.gradle.tooling.provider.model.ToolingModelBuilder;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+
+import org.eclipse.buildship.javaee.gradle.plugin.model.DefaultDependencyModel;
 
 /**
  * A model builder that builds the dependency model.
@@ -44,7 +46,7 @@ public class DependencyModelBuilder implements ToolingModelBuilder {
     }
 
     private ImmutableList<String> getDependenciesForConfiguration(Project project, String configuration) {
-        DependencySet dependencies = project.getConfigurations().getByName(configuration).getDependencies();
+        DependencySet dependencies = project.getConfigurations().getByName(configuration).getAllDependencies();
 
         return FluentIterable.from(dependencies).transform(new Function<Dependency, String>() {
             @Override

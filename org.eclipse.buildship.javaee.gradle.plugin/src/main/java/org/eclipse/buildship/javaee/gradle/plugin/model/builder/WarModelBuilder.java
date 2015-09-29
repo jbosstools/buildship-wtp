@@ -9,7 +9,7 @@
  *     Ian Stewart-Binks (Red Hat, Inc.) -
  */
 
-package org.eclipse.buildship.javaee.gradle.plugin;
+package org.eclipse.buildship.javaee.gradle.plugin.model.builder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,6 +20,8 @@ import org.gradle.api.Project;
 import org.gradle.api.UnknownTaskException;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
+
+import org.eclipse.buildship.javaee.gradle.plugin.model.DefaultWarModel;
 
 /**
  * A model builder that builds the war model.
