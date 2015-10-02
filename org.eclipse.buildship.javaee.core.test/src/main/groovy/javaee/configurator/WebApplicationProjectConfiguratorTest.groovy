@@ -21,8 +21,13 @@ import org.eclipse.jst.j2ee.web.project.facet.WebFacetUtils;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import com.gradleware.tooling.toolingclient.GradleDistribution
+import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
+
+import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
 import org.eclipse.buildship.core.workspace.SynchronizeGradleProjectJob
 import org.eclipse.core.runtime.NullProgressMonitor
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -110,26 +115,7 @@ class WebApplicationProjectConfiguratorTest extends ProjectImportSpecification {
         attr != null
     }
 
-    def "Test sources are not deployed"() {
-        def monitor = new NullProgressMonitor()
-        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot()
-
-        setup:
-        def location = folder('app')
-        folder('app', 'src', 'main', 'java')
-        file('app', 'settings.gradle') << ''
-        file('app', 'build.gradle') <<
-        '''apply plugin: "war"'''
-        file('app', 'src/main/java/TestClass.java') << ''
-
-        when:
-        executeProjectImportAndWait(location)
-
-        then:
-
-    }
-
-//    def "Test and provided dependencies are not deployed"() {
+//    def "Test sources are not deployed"() {
 //        def monitor = new NullProgressMonitor()
 //        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot()
 //
@@ -141,10 +127,127 @@ class WebApplicationProjectConfiguratorTest extends ProjectImportSpecification {
 //        '''apply plugin: "war"'''
 //        file('app', 'src/main/java/TestClass.java') << ''
 //
-//
 //        when:
 //        executeProjectImportAndWait(location)
 //
+//        then:
+//
 //    }
+
+    def "Test and provided dependencies are not marked as deployable"() {
+        def monitor = new NullProgressMonitor()
+        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot()
+
+        setup:
+        def location = folder('app')
+        folder('app', 'src', 'main', 'java')
+        file('app', 'settings.gradle') << ''
+        file('app', 'build.gradle') <<
+        '''apply plugin: 'war'
+//webAppDirName = 'src/main/somethingelse'
+
+repositories {
+    // Use 'jcenter' for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+
+dependencies {
+    compile gradleApi()
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    providedCompile 'javax.servlet:servlet-api:2.5'
+    // Declare the dependency for your favourite test framework you want to use in your tests.
+    // TestNG is also supported by the Gradle Test task. Just change the
+    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
+    // 'test.useTestNG()' to your build script.
+    testCompile 'junit:junit:4.12'
+}
+'''
+        file('app', 'src/main/java/TestClass.java') << ''
+
+        when:
+        executeProjectImportAndWait(location)
+        Thread.sleep(2000);
+
+        then:
+        def project = workspaceRoot.getProject('app2');
+        IJavaProject javaProject = JavaCore.create(project);
+        IClasspathContainer rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        IClasspathEntry servletEntry = rootContainer.getClasspathEntries().find({ it.getPath().toString().contains("junit") })
+        def servletAttr = servletEntry.getExtraAttributes().find({  it.name == "org.eclipse.jst.component.nondependency" && it.value == "/WEB-INF/lib" })
+        servletAttr != null
+    }
+
+    def "Project dependencies are marked as non-deployable, but are referenced in component file"() {
+        def monitor = new NullProgressMonitor()
+        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot()
+
+        setup:
+        def location = folder('app')
+        folder('app', 'src', 'main', 'java')
+        file('app', 'settings.gradle') << ''
+        file('app', 'build.gradle') <<
+        '''apply plugin: 'war'
+//webAppDirName = 'src/main/somethingelse'
+
+repositories {
+    // Use 'jcenter' for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+
+dependencies {
+    compile gradleApi()
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    providedCompile 'javax.servlet:servlet-api:2.5'
+    // Declare the dependency for your favourite test framework you want to use in your tests.
+    // TestNG is also supported by the Gradle Test task. Just change the
+    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
+    // 'test.useTestNG()' to your build script.
+    testCompile 'junit:junit:4.12'
+}
+'''
+
+        def depLocation = folder('dep')
+        folder('dep', 'src', 'main', 'java')
+        file('dep', 'settings.gradle') << ''
+        file('dep', 'build.gradle') <<
+        '''apply plugin: 'war'
+//webAppDirName = 'src/main/somethingelse'
+
+repositories {
+    // Use 'jcenter' for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+
+dependencies {
+    compile gradleApi()
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    providedCompile 'javax.servlet:servlet-api:2.5'
+    // Declare the dependency for your favourite test framework you want to use in your tests.
+    // TestNG is also supported by the Gradle Test task. Just change the
+    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
+    // 'test.useTestNG()' to your build script.
+    testCompile 'junit:junit:4.12'
+}
+'''
+        file('app', 'src/main/java/TestClass.java') << ''
+
+        when:
+        executeProjectImportAndWait(location)
+        Thread.sleep(2000);
+
+        then:
+        def project = workspaceRoot.getProject('app2');
+        IJavaProject javaProject = JavaCore.create(project);
+        IClasspathContainer rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        IClasspathEntry servletEntry = rootContainer.getClasspathEntries().find({ it.getPath().toString().contains("junit") })
+        def servletAttr = servletEntry.getExtraAttributes().find({  it.name == "org.eclipse.jst.component.nondependency" && it.value == "/WEB-INF/lib" })
+        servletAttr != null
+    }
 
 }

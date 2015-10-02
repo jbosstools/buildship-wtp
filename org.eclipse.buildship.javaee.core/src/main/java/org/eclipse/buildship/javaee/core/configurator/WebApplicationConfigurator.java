@@ -261,6 +261,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         IVirtualFolder jsrc = component.getRootFolder().getFolder("/");
         try {
+
+
             jsrc.removeLink(new Path("src/test/java"), 0, monitor);
         } catch (CoreException e) {
             // Should be returned in Istatus.
@@ -270,13 +272,43 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         return;
     }
 
+    /**
+     * Filters entries from firstEntries if they appear in secondEntries.
+     */
+    private ImmutableList<OmniGradleDep> filterClasspathEntries(List<OmniGradleDep> firstEntries, final List<OmniGradleDep> secondEntries) {
+        return FluentIterable.from(firstEntries).filter(new Predicate<OmniGradleDep>() {
+
+            @Override
+            public boolean apply(final OmniGradleDep dep1) {
+                return !FluentIterable.from(secondEntries).anyMatch(new Predicate<OmniGradleDep>() {
+
+                    @Override
+                    public boolean apply(OmniGradleDep dep2) {
+                        return dep1.getName().equals(dep2.getName());
+                    }
+                });
+            }
+        }).toList();
+    }
+
     private void getTestDependencies(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) throws JavaModelException {
+        // TODO: Mark projects as non deployable, but put references in component file
+        // TODO: Remove links of all non main source sets in component file
+
         OmniEclipseProject project = configurationRequest.getProject();
         IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
         IClasspathContainer rootContainer = null;
         String projectPath = configurationRequest.getProjectPath();
 
         rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        System.out.println(rootContainer);
+        for (IClasspathEntry entry : rootContainer.getClasspathEntries()) {
+            System.out.println("before ____" + entry);
+            System.out.println("____" + entry.getExtraAttributes().length);
+            if (entry.getExtraAttributes().length == 1) {
+                System.out.println(entry.getExtraAttributes()[0]);
+            }
+        }
 
         final List<OmniGradleDep> compileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "compile");
         List<OmniGradleDep> runtimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "runtime");
@@ -286,19 +318,11 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         List<OmniGradleDep> testCompileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testCompile");
         List<OmniGradleDep> testRuntimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testRuntime");
 
-        final ImmutableList<OmniGradleDep> filteredTestCompileDependencies = FluentIterable.from(testCompileDependencies).filter(new Predicate<OmniGradleDep>() {
+        final ImmutableList<OmniGradleDep> filteredTestCompileDependencies = filterClasspathEntries(testCompileDependencies, compileDependencies);
 
-            @Override
-            public boolean apply(final OmniGradleDep dep1) {
-                return !FluentIterable.from(compileDependencies).anyMatch(new Predicate<OmniGradleDep>() {
-
-                    @Override
-                    public boolean apply(OmniGradleDep dep2) {
-                        return dep1.getName().equals(dep2.getName());
-                    }
-                });
-            }
-        }).toList();
+        // Also filter runtimeDependencies
+        final ImmutableList<OmniGradleDep> filteredTestRuntimeDependenciesA = filterClasspathEntries(testRuntimeDependencies, compileDependencies);
+        final ImmutableList<OmniGradleDep> filteredTestRuntimeDependenciesB = filterClasspathEntries(filteredTestRuntimeDependenciesA, runtimeDependencies);
 
         for (OmniGradleDep dep : compileDependencies) {
             // If project, make reference in component
@@ -310,6 +334,14 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             @Override
             public IClasspathEntry apply(IClasspathEntry entry) {
                 for (OmniGradleDep dep : filteredTestCompileDependencies) {
+                    if (entry.getPath().toString().contains(dep.getName())) {
+                        if (entry.getPath().toString().contains(dep.getName())) {
+                            return markAsNonDeployable(entry);
+                        }
+                    }
+                }
+
+                for (OmniGradleDep dep : filteredTestRuntimeDependenciesB) {
                     if (entry.getPath().toString().contains(dep.getName())) {
                         if (entry.getPath().toString().contains(dep.getName())) {
                             return markAsNonDeployable(entry);
@@ -342,11 +374,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             if (entry.getExtraAttributes().length == 1) {
                 System.out.println(entry.getExtraAttributes()[0]);
             }
-        }
-
-        System.out.println("___ extern dependencies");
-        for ( OmniExternalDependency i : project.getExternalDependencies()) {
-            System.out.println("____" + i);
         }
 
     }
