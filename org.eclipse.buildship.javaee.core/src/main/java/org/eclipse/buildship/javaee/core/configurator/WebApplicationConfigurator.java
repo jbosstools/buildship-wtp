@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 
 import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
 import com.gradleware.tooling.toolingmodel.OmniExternalDependency;
@@ -41,6 +43,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jst.common.project.facet.core.JavaFacet;
 import org.eclipse.jst.common.project.facet.core.internal.JavaFacetUtil;
+import org.eclipse.jst.j2ee.classpathdep.IClasspathDependencyConstants;
 import org.eclipse.jst.j2ee.internal.J2EEVersionConstants;
 import org.eclipse.jst.j2ee.project.facet.IJ2EEModuleFacetInstallDataModelProperties;
 import org.eclipse.jst.j2ee.web.project.facet.IWebFacetInstallDataModelProperties;
@@ -61,7 +64,7 @@ import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
 import org.eclipse.buildship.core.configurator.IProjectConfigurator;
 import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
 import org.eclipse.buildship.javaee.core.Activator;
-import org.eclipse.buildship.javaee.core.OmniGradleDep;
+import org.eclipse.buildship.javaee.core.OmniGradleDependency;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
 import org.eclipse.buildship.javaee.core.ResourceCleaner;
 import org.eclipse.buildship.javaee.core.model.WarModel;
@@ -70,10 +73,9 @@ import org.eclipse.buildship.javaee.core.model.WarModel;
  * Configures an Eclipse Web Application project. The configurator is applied if and only if the
  * given project applies the Gradle 'war' plugin.
  *
- * This configurator implements the following steps, in this order:
- * 1. Add the Java web facet, and the Dynamic web facet.
- * 2. Remove any redundant files created by the addition of the dynamic web facet.
- * 3. Flag test dependencies as 'non-deploy' in component file.
+ * This configurator implements the following steps, in this order: 1. Add the Java web facet, and
+ * the Dynamic web facet. 2. Remove any redundant files created by the addition of the dynamic web
+ * facet. 3. Flag test dependencies as 'non-deploy' in component file.
  *
  */
 @SuppressWarnings({ "restriction" })
@@ -84,13 +86,14 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     @Override
     public boolean canConfigure(ProjectConfigurationRequest configurationRequest) {
         String projectPath = configurationRequest.getWorkspaceProject().getLocationURI().getPath();
-        Activator.getLogger().info("Checking if war configurator can be applied...: " + ProjectAnalyzer.isWarProject(projectPath));
+        System.out.println("Checking if war configurator can be applied...: " + ProjectAnalyzer.isWarProject(projectPath));
         return ProjectAnalyzer.isWarProject(projectPath);
     }
 
     @Override
     public IStatus configure(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) {
         System.out.println("Web App Project Configuration Starting");
+
         MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, "", null);
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         OmniEclipseProject project = configurationRequest.getProject();
@@ -98,7 +101,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             configureFacets(configurationRequest, monitor, multiStatus);
             makeGradleContainerDeployable(configurationRequest, monitor);
             removeTestFolderLinks(workspaceProject, project, monitor);
-            getTestDependencies(configurationRequest);
+            markTestAndProvidedDependenciesAsNonDeployable(configurationRequest, monitor);
         } catch (Exception e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
@@ -136,7 +139,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     // 'Inspired by'
     // https://github.com/eclipse/m2e.wtp/blob/3ef31ea28a4ea6f5728eb38a6f4d2712b8a4d333/org.eclipse.m2e.wtp/src/org/eclipse/m2e/wtp/WebProjectConfiguratorDelegate.java
     private void installJavaFacet(Set<Action> actions, IProject project, IFacetedProject facetedProject) {
-        // Source for JavaFacetUtil:
+        // Source for JavaFacetU
         // https://eclipse.googlesource.com/webtools-common/webtools.common.fproj/+/b01e5326cd9de1afb60f6a25a81c7b152a08b526/plugins/org.eclipse.jst.common.project.facet.core/src/org/eclipse/jst/common/project/facet/core/internal/JavaFacetUtil.java
         // May be worthwhile not using an internal method.
         IProjectFacetVersion javaFacetVersion = JavaFacet.FACET.getVersion(JavaFacetUtil.getCompilerLevel(project));
@@ -223,7 +226,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             public IClasspathEntry apply(IClasspathEntry entry) {
                 String path = entry.getPath().toString();
                 if (path.equals(GRADLE_CLASSPATH_CONTAINER_PATH)) {
-                    IClasspathEntry newGradleContainerEntry = modifyGradleContainerEntry(entry);
+                    IClasspathEntry newGradleContainerEntry = markAsDeployable(entry);
                     return newGradleContainerEntry;
                 } else {
                     return entry;
@@ -234,12 +237,16 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
     }
 
-    /**
-     * Adds the org.eclipse.jst.component.dependency attribute to the Gradle classpath container
-     * attribute.
-     */
-    private IClasspathEntry modifyGradleContainerEntry(IClasspathEntry entry) {
-        IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute("org.eclipse.jst.component.dependency", "/WEB-INF/lib");
+    private IClasspathEntry markAsDeployable(IClasspathEntry entry) {
+        IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute(IClasspathDependencyConstants.CLASSPATH_COMPONENT_DEPENDENCY, "/WEB-INF/lib");
+        List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
+        gradleContainerAttributes.add(newAttribute);
+        return JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes
+                .toArray(new IClasspathAttribute[gradleContainerAttributes.size()]), entry.isExported());
+    }
+
+    private IClasspathEntry markAsNonDeployable(IClasspathEntry entry) {
+        IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute(IClasspathDependencyConstants.CLASSPATH_COMPONENT_NON_DEPENDENCY, "/WEB-INF/lib");
         List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
         gradleContainerAttributes.add(newAttribute);
         return JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes
@@ -254,6 +261,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         IVirtualFolder jsrc = component.getRootFolder().getFolder("/");
         try {
+
+
             jsrc.removeLink(new Path("src/test/java"), 0, monitor);
         } catch (CoreException e) {
             // Should be returned in Istatus.
@@ -263,38 +272,75 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         return;
     }
 
-    private void getTestDependencies(ProjectConfigurationRequest configurationRequest) {
-        System.out.println(">>> getTestDependencies");
-        OmniEclipseProject project = configurationRequest.getProject();
+    /**
+     * Filters entries from firstEntries if they appear in secondEntries.
+     */
+    private ImmutableList<OmniGradleDependency> filterClasspathEntries(List<OmniGradleDependency> firstEntries, final List<OmniGradleDependency> secondEntries) {
+        return FluentIterable.from(firstEntries).filter(new Predicate<OmniGradleDependency>() {
+
+            @Override
+            public boolean apply(final OmniGradleDependency dep1) {
+                return !FluentIterable.from(secondEntries).anyMatch(new Predicate<OmniGradleDependency>() {
+
+                    @Override
+                    public boolean apply(OmniGradleDependency dep2) {
+                        return dep1.getName().equals(dep2.getName());
+                    }
+                });
+            }
+        }).toList();
+    }
+
+    private void markTestAndProvidedDependenciesAsNonDeployable(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) throws JavaModelException {
+        // TODO: Mark projects as non deployable, but put references in component file
+        // TODO: Remove links of all non main source sets in component file
+        // TODO: Do same thing for providedCompile/providedRuntime
+
         IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
         IClasspathContainer rootContainer = null;
         String projectPath = configurationRequest.getProjectPath();
-        try {
-            rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
-        } catch (JavaModelException e) {
-            e.printStackTrace();
-        }
 
-        System.out.println("disect 1");
-        List<OmniGradleDep> comp = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "compile");
+        rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        final List<OmniGradleDependency> compileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "compile");
+        List<OmniGradleDependency> runtimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "runtime");
 
-        System.out.println("disect 2");
-        for (OmniGradleDep dep : comp) {
-            System.out.println("dep name: " + dep.getName());
-        }
+        List<IClasspathEntry> classpathEntries = Arrays.asList(rootContainer.getClasspathEntries());
 
-        System.out.println("___ classpath entries");
-        for (IClasspathEntry i : rootContainer.getClasspathEntries()) {
-            System.out.println("____" + i);
-        }
+        List<OmniGradleDependency> testCompileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testCompile");
+        List<OmniGradleDependency> testRuntimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testRuntime");
 
-        System.out.println("___ extern dependencies");
-        for (OmniExternalDependency i : project.getExternalDependencies()) {
-            System.out.println("____" + i.toString());
-        }
+        final ImmutableList<OmniGradleDependency> filteredTestCompileDependencies = filterClasspathEntries(testCompileDependencies, compileDependencies);
 
+        // Also filter runtimeDependencies
+        final ImmutableList<OmniGradleDependency> filteredTestRuntimeDependenciesA = filterClasspathEntries(testRuntimeDependencies, compileDependencies);
+        final ImmutableList<OmniGradleDependency> filteredTestRuntimeDependenciesB = filterClasspathEntries(filteredTestRuntimeDependenciesA, runtimeDependencies);
 
-        System.out.println("<<< getTestDependencies");
+        List<IClasspathEntry> newEntries = FluentIterable.from(classpathEntries).transform(new Function<IClasspathEntry, IClasspathEntry>() {
+
+            @Override
+            public IClasspathEntry apply(IClasspathEntry entry) {
+                for (OmniGradleDependency dep : filteredTestCompileDependencies) {
+                    if (entry.getPath().toString().contains(dep.getName())) {
+                        if (entry.getPath().toString().contains(dep.getName())) {
+                            return markAsNonDeployable(entry);
+                        }
+                    }
+                }
+
+                for (OmniGradleDependency dep : filteredTestRuntimeDependenciesB) {
+                    if (entry.getPath().toString().contains(dep.getName())) {
+                        if (entry.getPath().toString().contains(dep.getName())) {
+                            return markAsNonDeployable(entry);
+                        }
+                    }
+                }
+
+                return entry;
+            }
+        }).toList();
+
+        IClasspathContainer classpathContainer = GradleClasspathContainer.newInstance(newEntries);
+        JavaCore.setClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), new IJavaProject[] { javaProject }, new IClasspathContainer[] {classpathContainer}, monitor);
     }
 
 }

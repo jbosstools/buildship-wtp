@@ -101,10 +101,10 @@ public class ProjectAnalyzer {
         }
     }
 
-    public static List<OmniGradleDep> getDependenciesForConfiguration(String projectPath, String configuration) {
+    public static List<OmniGradleDependency> getDependenciesForConfiguration(String projectPath, String configuration) {
         DependencyModel dependencyModel = getDependencyModel(projectPath);
         System.out.println("Retrieved gependency model");
-        List<OmniGradleDep> dp = dependencyModel.getDependenciesForConfiguration(configuration);
+        List<OmniGradleDependency> dp = dependencyModel.getDependenciesForConfiguration(configuration);
         System.out.println("Got DPS");
         return dp;
     }
