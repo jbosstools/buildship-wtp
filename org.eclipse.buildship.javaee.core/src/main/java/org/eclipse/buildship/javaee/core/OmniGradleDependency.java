@@ -1,9 +1,8 @@
 package org.eclipse.buildship.javaee.core;
 
 
-public interface OmniGradleDep {
+public interface OmniGradleDependency {
     public String getName();
     public String getGroup();
     public String getVersion();
-
 }

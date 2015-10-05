@@ -17,7 +17,7 @@ import java.io.Serializable;
  * Bundles a Gradle Dependency such that it can be retrieved from the DependencyModel.
  * The Gradle Dependency cannot itself do this, as it needs to be serializable.
  */
-public class GradleDependency implements Serializable, OmniGradleDep {
+public class GradleDependency implements Serializable, OmniGradleDependency {
 
     private static final long serialVersionUID = 7436966156072507360L;
     private String name;

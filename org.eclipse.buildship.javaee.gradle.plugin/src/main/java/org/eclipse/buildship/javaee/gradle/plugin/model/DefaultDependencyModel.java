@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.buildship.javaee.core.GradleDependency;
-import org.eclipse.buildship.javaee.core.OmniGradleDep;
+import org.eclipse.buildship.javaee.core.OmniGradleDependency;
 
 /**
  * Implementation of the DependencyModel.
@@ -24,16 +24,16 @@ import org.eclipse.buildship.javaee.core.OmniGradleDep;
 public class DefaultDependencyModel implements Serializable {
 
     private static final long serialVersionUID = -8931280253307342724L;
-    private final List<OmniGradleDep> compileDependencies;
-    private final List<OmniGradleDep> runtimeDependencies;
-    private final List<OmniGradleDep> testCompileDependencies;
-    private final List<OmniGradleDep> testRuntimeDependencies;
-    private final List<OmniGradleDep> providedCompileDependencies;
-    private final List<OmniGradleDep> providedRuntimeDependencies;
+    private final List<OmniGradleDependency> compileDependencies;
+    private final List<OmniGradleDependency> runtimeDependencies;
+    private final List<OmniGradleDependency> testCompileDependencies;
+    private final List<OmniGradleDependency> testRuntimeDependencies;
+    private final List<OmniGradleDependency> providedCompileDependencies;
+    private final List<OmniGradleDependency> providedRuntimeDependencies;
 
-    public DefaultDependencyModel(List<OmniGradleDep> compileDependencies, List<OmniGradleDep> runtimeDependencies,
-            List<OmniGradleDep> testCompileDependencies, List<OmniGradleDep> testRuntimeDependencies,
-            List<OmniGradleDep> providedCompileDependencies, List<OmniGradleDep> providedRuntimeDependencies) {
+    public DefaultDependencyModel(List<OmniGradleDependency> compileDependencies, List<OmniGradleDependency> runtimeDependencies,
+            List<OmniGradleDependency> testCompileDependencies, List<OmniGradleDependency> testRuntimeDependencies,
+            List<OmniGradleDependency> providedCompileDependencies, List<OmniGradleDependency> providedRuntimeDependencies) {
         this.compileDependencies = compileDependencies;
         this.runtimeDependencies = runtimeDependencies;
         this.testCompileDependencies = testCompileDependencies;
@@ -42,7 +42,7 @@ public class DefaultDependencyModel implements Serializable {
         this.providedRuntimeDependencies = providedRuntimeDependencies;
     }
 
-    public List<OmniGradleDep> getDependenciesForConfiguration(String configuration) {
+    public List<OmniGradleDependency> getDependenciesForConfiguration(String configuration) {
         if (configuration == "compile") {
             return this.compileDependencies;
         } else if (configuration == "runtime") {
@@ -56,7 +56,7 @@ public class DefaultDependencyModel implements Serializable {
         } else if (configuration == "providedRuntime") {
             return this.providedRuntimeDependencies;
         }
-        return new ArrayList<OmniGradleDep>();
+        return new ArrayList<OmniGradleDependency>();
     }
 
 }

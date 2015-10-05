@@ -64,7 +64,7 @@ import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
 import org.eclipse.buildship.core.configurator.IProjectConfigurator;
 import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
 import org.eclipse.buildship.javaee.core.Activator;
-import org.eclipse.buildship.javaee.core.OmniGradleDep;
+import org.eclipse.buildship.javaee.core.OmniGradleDependency;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
 import org.eclipse.buildship.javaee.core.ResourceCleaner;
 import org.eclipse.buildship.javaee.core.model.WarModel;
@@ -101,7 +101,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             configureFacets(configurationRequest, monitor, multiStatus);
             makeGradleContainerDeployable(configurationRequest, monitor);
             removeTestFolderLinks(workspaceProject, project, monitor);
-            getTestDependencies(configurationRequest, monitor);
+            markTestAndProvidedDependenciesAsNonDeployable(configurationRequest, monitor);
         } catch (Exception e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
@@ -275,15 +275,15 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     /**
      * Filters entries from firstEntries if they appear in secondEntries.
      */
-    private ImmutableList<OmniGradleDep> filterClasspathEntries(List<OmniGradleDep> firstEntries, final List<OmniGradleDep> secondEntries) {
-        return FluentIterable.from(firstEntries).filter(new Predicate<OmniGradleDep>() {
+    private ImmutableList<OmniGradleDependency> filterClasspathEntries(List<OmniGradleDependency> firstEntries, final List<OmniGradleDependency> secondEntries) {
+        return FluentIterable.from(firstEntries).filter(new Predicate<OmniGradleDependency>() {
 
             @Override
-            public boolean apply(final OmniGradleDep dep1) {
-                return !FluentIterable.from(secondEntries).anyMatch(new Predicate<OmniGradleDep>() {
+            public boolean apply(final OmniGradleDependency dep1) {
+                return !FluentIterable.from(secondEntries).anyMatch(new Predicate<OmniGradleDependency>() {
 
                     @Override
-                    public boolean apply(OmniGradleDep dep2) {
+                    public boolean apply(OmniGradleDependency dep2) {
                         return dep1.getName().equals(dep2.getName());
                     }
                 });
@@ -291,49 +291,35 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         }).toList();
     }
 
-    private void getTestDependencies(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) throws JavaModelException {
+    private void markTestAndProvidedDependenciesAsNonDeployable(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) throws JavaModelException {
         // TODO: Mark projects as non deployable, but put references in component file
         // TODO: Remove links of all non main source sets in component file
+        // TODO: Do same thing for providedCompile/providedRuntime
 
-        OmniEclipseProject project = configurationRequest.getProject();
         IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
         IClasspathContainer rootContainer = null;
         String projectPath = configurationRequest.getProjectPath();
 
         rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
-        System.out.println(rootContainer);
-        for (IClasspathEntry entry : rootContainer.getClasspathEntries()) {
-            System.out.println("before ____" + entry);
-            System.out.println("____" + entry.getExtraAttributes().length);
-            if (entry.getExtraAttributes().length == 1) {
-                System.out.println(entry.getExtraAttributes()[0]);
-            }
-        }
-
-        final List<OmniGradleDep> compileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "compile");
-        List<OmniGradleDep> runtimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "runtime");
+        final List<OmniGradleDependency> compileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "compile");
+        List<OmniGradleDependency> runtimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "runtime");
 
         List<IClasspathEntry> classpathEntries = Arrays.asList(rootContainer.getClasspathEntries());
 
-        List<OmniGradleDep> testCompileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testCompile");
-        List<OmniGradleDep> testRuntimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testRuntime");
+        List<OmniGradleDependency> testCompileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testCompile");
+        List<OmniGradleDependency> testRuntimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testRuntime");
 
-        final ImmutableList<OmniGradleDep> filteredTestCompileDependencies = filterClasspathEntries(testCompileDependencies, compileDependencies);
+        final ImmutableList<OmniGradleDependency> filteredTestCompileDependencies = filterClasspathEntries(testCompileDependencies, compileDependencies);
 
         // Also filter runtimeDependencies
-        final ImmutableList<OmniGradleDep> filteredTestRuntimeDependenciesA = filterClasspathEntries(testRuntimeDependencies, compileDependencies);
-        final ImmutableList<OmniGradleDep> filteredTestRuntimeDependenciesB = filterClasspathEntries(filteredTestRuntimeDependenciesA, runtimeDependencies);
-
-        for (OmniGradleDep dep : compileDependencies) {
-            // If project, make reference in component
-            System.out.println("dep name: " + dep.getName());
-        }
+        final ImmutableList<OmniGradleDependency> filteredTestRuntimeDependenciesA = filterClasspathEntries(testRuntimeDependencies, compileDependencies);
+        final ImmutableList<OmniGradleDependency> filteredTestRuntimeDependenciesB = filterClasspathEntries(filteredTestRuntimeDependenciesA, runtimeDependencies);
 
         List<IClasspathEntry> newEntries = FluentIterable.from(classpathEntries).transform(new Function<IClasspathEntry, IClasspathEntry>() {
 
             @Override
             public IClasspathEntry apply(IClasspathEntry entry) {
-                for (OmniGradleDep dep : filteredTestCompileDependencies) {
+                for (OmniGradleDependency dep : filteredTestCompileDependencies) {
                     if (entry.getPath().toString().contains(dep.getName())) {
                         if (entry.getPath().toString().contains(dep.getName())) {
                             return markAsNonDeployable(entry);
@@ -341,7 +327,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
                     }
                 }
 
-                for (OmniGradleDep dep : filteredTestRuntimeDependenciesB) {
+                for (OmniGradleDependency dep : filteredTestRuntimeDependenciesB) {
                     if (entry.getPath().toString().contains(dep.getName())) {
                         if (entry.getPath().toString().contains(dep.getName())) {
                             return markAsNonDeployable(entry);
@@ -353,29 +339,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             }
         }).toList();
 
-        for (OmniGradleDep dep : filteredTestCompileDependencies) {
-            // If project, make reference in component
-            System.out.println("test dep name: " + dep.getName());
-        }
         IClasspathContainer classpathContainer = GradleClasspathContainer.newInstance(newEntries);
         JavaCore.setClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), new IJavaProject[] { javaProject }, new IClasspathContainer[] {classpathContainer}, monitor);
-
-        rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
-
-        for (OmniGradleDep dep : testRuntimeDependencies) {
-            System.out.println("dep name: " + dep.getName());
-        }
-
-        System.out.println("___ classpath entries");
-
-        for (IClasspathEntry entry : rootContainer.getClasspathEntries()) {
-            System.out.println("____" + entry);
-            System.out.println("____" + entry.getExtraAttributes().length);
-            if (entry.getExtraAttributes().length == 1) {
-                System.out.println(entry.getExtraAttributes()[0]);
-            }
-        }
-
     }
 
 }
