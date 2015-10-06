@@ -11,6 +11,7 @@
 
 package org.eclipse.buildship.javaee.core.configurator;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -19,12 +20,15 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.gradle.api.file.FileCollection;
+
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
+import com.gradleware.tooling.toolingmodel.OmniEclipseSourceDirectory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -66,6 +70,7 @@ import org.eclipse.buildship.javaee.core.Activator;
 import org.eclipse.buildship.javaee.core.OmniGradleDependency;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
 import org.eclipse.buildship.javaee.core.ResourceCleaner;
+import org.eclipse.buildship.javaee.core.model.SourceSetModel;
 import org.eclipse.buildship.javaee.core.model.WarModel;
 
 /**
@@ -99,8 +104,8 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         try {
             configureFacets(configurationRequest, monitor, multiStatus);
             makeGradleContainerDeployable(configurationRequest, monitor);
-            removeTestFolderLinks(workspaceProject, project, monitor);
             markTestAndProvidedDependenciesAsNonDeployable(configurationRequest, monitor);
+            removeTestSourceSetLinks(configurationRequest, monitor);
         } catch (Exception e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
@@ -236,6 +241,9 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[newEntries.size()]), monitor);
     }
 
+    /**
+     * TODO: Refactor this and markAsNonDeployable.
+     */
     private IClasspathEntry markAsDeployable(IClasspathEntry entry) {
         IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute(IClasspathDependencyConstants.CLASSPATH_COMPONENT_DEPENDENCY, "/WEB-INF/lib");
         List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
@@ -250,25 +258,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         gradleContainerAttributes.add(newAttribute);
         return JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes
                 .toArray(new IClasspathAttribute[gradleContainerAttributes.size()]), entry.isExported());
-    }
-
-    private void removeTestFolderLinks(IProject workspaceProject, OmniEclipseProject project, IProgressMonitor monitor) {
-        IVirtualComponent component = ComponentCore.createComponent(workspaceProject);
-        if (component == null) {
-            return;
-        }
-
-        IVirtualFolder jsrc = component.getRootFolder().getFolder("/");
-        try {
-
-
-            jsrc.removeLink(new Path("src/test/java"), 0, monitor);
-        } catch (CoreException e) {
-            // Should be returned in Istatus.
-            Activator.getLogger().error(e.getMessage(), e);
-        }
-
-        return;
     }
 
     /**
@@ -290,9 +279,28 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         }).toList();
     }
 
+    /**
+     * Removes the test source set directory links from the component file.
+     * TODO: Remove all non main source set directory links.
+     */
+    private void removeTestSourceSetLinks(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) {
+        IProject workspaceProject = configurationRequest.getWorkspaceProject();
+
+        IVirtualComponent component = ComponentCore.createComponent(workspaceProject);
+        SourceSetModel sourceSetModel = ProjectAnalyzer.getSourceSetModel(configurationRequest.getProjectPath());
+
+        IVirtualFolder jsrc = component.getRootFolder().getFolder("/");
+        for (File sourceSetDirectory : sourceSetModel.getSourceSets().getTestSourceSet()) {
+            try {
+                jsrc.removeLink(new Path(sourceSetDirectory.getPath()), 0, monitor);
+            } catch (CoreException e) {
+                Activator.getLogger().error(e.getMessage(), e);
+            }
+        }
+    }
+
     private void markTestAndProvidedDependenciesAsNonDeployable(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) throws JavaModelException {
         // TODO: Mark projects as non deployable, but put references in component file
-        // TODO: Remove links of all non main source sets in component file
 
         IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
         IClasspathContainer rootContainer = null;
