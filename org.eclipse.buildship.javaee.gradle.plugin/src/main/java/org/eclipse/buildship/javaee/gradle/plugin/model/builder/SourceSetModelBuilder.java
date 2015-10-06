@@ -35,14 +35,6 @@ public class SourceSetModelBuilder implements ToolingModelBuilder {
         final JavaPluginConvention javaPluginConvention = project.getConvention().findPlugin(JavaPluginConvention.class);
         SourceSet main = javaPluginConvention.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
         SourceSet test = javaPluginConvention.getSourceSets().getByName(SourceSet.TEST_SOURCE_SET_NAME);
-
-        String mainStr = "";
-        String testStr = "";
-
-        for (File f : main.getAllSource().getSrcDirs()) {
-            mainStr += f.getPath();
-        }
-
         return new DefaultSourceSetModel(main.getAllSource().getSrcDirs(), test.getAllSource().getSrcDirs());
     }
 
