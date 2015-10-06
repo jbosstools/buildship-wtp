@@ -36,8 +36,8 @@ public class Activator extends Plugin {
 
     public static final String PLUGIN_ID = "org.eclipse.buildship.javaee.core"; //$NON-NLS-1$
     private static Activator plugin;
-    private ServiceRegistration loggerService;
-    private ServiceTracker loggerServiceTracker;
+    private ServiceRegistration<?> loggerService;
+    private ServiceTracker<?, ?> loggerServiceTracker;
 
     public static Activator getInstance() {
         return plugin;
@@ -70,12 +70,12 @@ public class Activator extends Plugin {
         this.loggerServiceTracker.close();
     }
 
-    private <T> ServiceRegistration registerService(BundleContext context, Class<T> clazz, T service, Dictionary<String, Object> properties) {
+    private <T> ServiceRegistration<?> registerService(BundleContext context, Class<T> clazz, T service, Dictionary<String, Object> properties) {
         return context.registerService(clazz.getName(), service, properties);
     }
 
-    private ServiceTracker createServiceTracker(BundleContext context, Class<?> clazz) {
-        ServiceTracker serviceTracker = new ServiceTracker(context, clazz.getName(), null);
+    private ServiceTracker<?, ?> createServiceTracker(BundleContext context, Class<?> clazz) {
+        ServiceTracker<?, ?> serviceTracker = new ServiceTracker<Object, Object>(context, clazz.getName(), null);
         serviceTracker.open();
         return serviceTracker;
     }

@@ -309,7 +309,9 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
         final List<OmniGradleDependency> compileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "compile");
         List<OmniGradleDependency> runtimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "runtime");
-
+        for (OmniGradleDependency dep : compileDependencies) {
+            System.out.println("Dep name" + dep.getName());
+        }
         List<IClasspathEntry> classpathEntries = Arrays.asList(rootContainer.getClasspathEntries());
 
         List<OmniGradleDependency> testCompileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testCompile");

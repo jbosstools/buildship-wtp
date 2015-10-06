@@ -129,10 +129,7 @@ public class ProjectAnalyzer {
 
     public static List<OmniGradleDependency> getDependenciesForConfiguration(String projectPath, String configuration) {
         DependencyModel dependencyModel = getDependencyModel(projectPath);
-        System.out.println("Retrieved gependency model");
-        List<OmniGradleDependency> dp = dependencyModel.getDependenciesForConfiguration(configuration);
-        System.out.println("Got DPS");
-        return dp;
+        return dependencyModel.getDependenciesForConfiguration(configuration);
     }
 
 }

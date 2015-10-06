@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="buildship-mars" sequenceNumber="60">
+<?pde version="3.8"?><target name="buildship-mars" sequenceNumber="61">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.wst.common.fproj.feature.group" version="3.7.0.v201505072140"/>
