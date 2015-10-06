@@ -18,6 +18,7 @@ import org.gradle.api.Project;
 import org.gradle.tooling.provider.model.ToolingModelBuilderRegistry;
 
 import org.eclipse.buildship.javaee.gradle.plugin.model.builder.DependencyModelBuilder;
+import org.eclipse.buildship.javaee.gradle.plugin.model.builder.SourceSetModelBuilder;
 import org.eclipse.buildship.javaee.gradle.plugin.model.builder.WarModelBuilder;
 
 /**
@@ -35,5 +36,6 @@ public class JavaEEPlugin implements Plugin<Project> {
     public void apply(Project project) {
         this.registry.register(new WarModelBuilder());
         this.registry.register(new DependencyModelBuilder());
+        this.registry.register(new SourceSetModelBuilder());
     }
 }

@@ -21,6 +21,7 @@ import org.gradle.tooling.ProjectConnection;
 import org.eclipse.core.runtime.IPath;
 
 import org.eclipse.buildship.javaee.core.model.DependencyModel;
+import org.eclipse.buildship.javaee.core.model.SourceSetModel;
 import org.eclipse.buildship.javaee.core.model.WarModel;
 
 /**
@@ -50,7 +51,6 @@ public class ProjectAnalyzer {
         } finally {
             closeConnection(connection);
         }
-
     }
 
     /**
@@ -67,6 +67,21 @@ public class ProjectAnalyzer {
             closeConnection(connection);
         }
 
+    }
+
+    /**
+     * Gets the War model of the project located at projectPath.
+     */
+    public static SourceSetModel getSourceSetModel(String projectPath) {
+        ProjectConnection connection = null;
+        try {
+            GradleConnector connector = initializeConnector(projectPath);
+            connection = connector.connect();
+            SourceSetModel model = buildSourceSetModel(connection);
+            return model;
+        } finally {
+            closeConnection(connection);
+        }
     }
 
     private static GradleConnector initializeConnector(String projectPath) {
@@ -94,6 +109,17 @@ public class ProjectAnalyzer {
         customModelBuilder.withArguments("--init-script", INIT_FILE_PATH, "-DpluginDirectory=" + pluginDirectory);
         return customModelBuilder.get();
     }
+
+    /**
+     * Builds the WarModel based on what's defined in the project's Gradle build script.
+     */
+    private static SourceSetModel buildSourceSetModel(ProjectConnection connection) {
+        ModelBuilder<SourceSetModel> customModelBuilder = connection.model(SourceSetModel.class);
+        IPath pluginDirectory = Activator.getInstance().getStateLocation().append("repo");
+        customModelBuilder.withArguments("--init-script", INIT_FILE_PATH, "-DpluginDirectory=" + pluginDirectory);
+        return customModelBuilder.get();
+    }
+
 
     private static void closeConnection(ProjectConnection connection) {
         if (connection != null) {
