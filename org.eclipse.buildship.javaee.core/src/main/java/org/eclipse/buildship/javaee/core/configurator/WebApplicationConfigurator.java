@@ -59,6 +59,8 @@ import org.eclipse.wst.common.project.facet.core.IFacetedProject.Action;
 import org.eclipse.wst.common.project.facet.core.IProjectFacetVersion;
 import org.eclipse.wst.common.project.facet.core.ProjectFacetsManager;
 
+import org.eclipse.buildship.core.configuration.ProjectConfigurationRequest;
+import org.eclipse.buildship.core.configurator.IProjectConfigurator;
 import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
 import org.eclipse.buildship.javaee.core.Activator;
 import org.eclipse.buildship.javaee.core.OmniGradleDependency;
@@ -291,7 +293,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
     private void markTestAndProvidedDependenciesAsNonDeployable(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) throws JavaModelException {
         // TODO: Mark projects as non deployable, but put references in component file
         // TODO: Remove links of all non main source sets in component file
-        // TODO: Do same thing for providedCompile/providedRuntime
 
         IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
         IClasspathContainer rootContainer = null;
@@ -305,6 +306,9 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         List<OmniGradleDependency> testCompileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testCompile");
         List<OmniGradleDependency> testRuntimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testRuntime");
+
+        final List<OmniGradleDependency> providedCompileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "providedCompile");
+        final List<OmniGradleDependency> providedRuntimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "providedRuntime");
 
         final ImmutableList<OmniGradleDependency> filteredTestCompileDependencies = filterClasspathEntries(testCompileDependencies, compileDependencies);
 
@@ -325,6 +329,22 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
                 }
 
                 for (OmniGradleDependency dep : filteredTestRuntimeDependenciesB) {
+                    if (entry.getPath().toString().contains(dep.getName())) {
+                        if (entry.getPath().toString().contains(dep.getName())) {
+                            return markAsNonDeployable(entry);
+                        }
+                    }
+                }
+
+                for (OmniGradleDependency dep : providedCompileDependencies) {
+                    if (entry.getPath().toString().contains(dep.getName())) {
+                        if (entry.getPath().toString().contains(dep.getName())) {
+                            return markAsNonDeployable(entry);
+                        }
+                    }
+                }
+
+                for (OmniGradleDependency dep : providedRuntimeDependencies) {
                     if (entry.getPath().toString().contains(dep.getName())) {
                         if (entry.getPath().toString().contains(dep.getName())) {
                             return markAsNonDeployable(entry);
