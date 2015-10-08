@@ -18,7 +18,6 @@ import java.io.File;
  * be values directly declared in a project's build.gradle file.
  */
 public interface WarModel {
-
     boolean hasWarPlugin();
 
     File getWebAppDir();
@@ -26,5 +25,4 @@ public interface WarModel {
     String getWebAppDirName();
 
     String getWebXmlName();
-
 }
