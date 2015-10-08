@@ -106,6 +106,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             makeGradleContainerDeployable(configurationRequest, monitor);
             markTestAndProvidedDependenciesAsNonDeployable(configurationRequest, monitor);
             removeTestSourceSetLinks(configurationRequest, monitor);
+            printProjectDependencies(configurationRequest);
         } catch (Exception e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
@@ -368,6 +369,14 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         IClasspathContainer classpathContainer = GradleClasspathContainer.newInstance(newEntries);
         JavaCore.setClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), new IJavaProject[] { javaProject }, new IClasspathContainer[] {classpathContainer}, monitor);
+    }
+
+    private void printProjectDependencies(ProjectConfigurationRequest configurationRequest) {
+        String projectPath = configurationRequest.getProjectPath();
+        final List<OmniGradleDependency> compileDependencies = ProjectAnalyzer.getProjectDependenciesForConfiguration(projectPath, "compile");
+        for (OmniGradleDependency i : compileDependencies) {
+            System.out.println("Project Dependency " + i.getName());
+        }
     }
 
 }

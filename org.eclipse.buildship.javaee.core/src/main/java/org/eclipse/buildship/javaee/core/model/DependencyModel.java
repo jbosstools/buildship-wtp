@@ -19,7 +19,6 @@ import org.eclipse.buildship.javaee.core.OmniGradleDependency;
  * Used to interact with a project's dependencies.
  */
 public interface DependencyModel {
-
     List<OmniGradleDependency> getDependenciesForConfiguration(String configuration);
-
+    List<OmniGradleDependency> getProjectDependenciesForConfiguration(String configuration);
 }

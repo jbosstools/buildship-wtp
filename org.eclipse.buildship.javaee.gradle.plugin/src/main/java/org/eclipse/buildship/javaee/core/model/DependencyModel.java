@@ -20,4 +20,5 @@ import org.eclipse.buildship.javaee.core.OmniGradleDependency;
  */
 public interface DependencyModel {
     List<OmniGradleDependency> getDependenciesForConfiguration(String configuration);
+    List<OmniGradleDependency> getProjectDependenciesForConfiguration(String configuration);
 }
