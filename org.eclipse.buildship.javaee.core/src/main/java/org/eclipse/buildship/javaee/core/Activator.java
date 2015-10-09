@@ -12,6 +12,7 @@
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Dictionary;
 
@@ -100,17 +101,31 @@ public class Activator extends Plugin {
         IPath guavaPath = metadataPath.append("repo").append("guava-15.0.jar");
 
         Bundle bundle = Platform.getBundle(PLUGIN_ID);
-        URL initUrl = bundle.getEntry("init.gradle");
-        URL pluginUrl = bundle.getEntry("/repo/libs/redhat-plugin-1.0.jar");
-        URL repoUrl = bundle.getEntry("/repo/");
-        URL guavaUrl = bundle.getEntry("/lib/guava-15.0.jar");
+        URL initUrl = FileLocator.toFileURL(bundle.getEntry("init.gradle"));
+        URL pluginUrl = FileLocator.toFileURL(bundle.getEntry("/repo/libs/redhat-plugin-1.0.jar"));
+        URL repoUrl = FileLocator.toFileURL(bundle.getEntry("/repo/"));
+        URL guavaUrl = FileLocator.toFileURL(bundle.getEntry("/lib/guava-15.0.jar"));
 
         getLogger().info("Init URL   : " + initUrl);
         getLogger().info("Plug-in URL: " + pluginUrl);
-        File initFile = new File(FileLocator.toFileURL(initUrl).toURI());
-        File pluginFile = new File(FileLocator.toFileURL(pluginUrl).toURI());
-        File repoFile = new File(FileLocator.toFileURL(repoUrl).toURI());
-        File guavaFile = new File(FileLocator.toFileURL(guavaUrl).toURI());
+
+        File initFile;
+        File pluginFile;
+        File repoFile;
+        File guavaFile;
+
+        // Adapted from https://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html
+        try {
+            initFile = new File(initUrl.toURI());
+            pluginFile = new File(pluginUrl.toURI());
+            repoFile = new File(repoUrl.toURI());
+            guavaFile = new File(guavaUrl.toURI());
+        } catch(URISyntaxException e) {
+            initFile = new File(initUrl.getPath());
+            pluginFile = new File(pluginUrl.getPath());
+            repoFile = new File(repoUrl.getPath());
+            guavaFile = new File(guavaUrl.getPath());
+        }
 
         FileUtils.copyFile(initFile, new File(initGradlePath.toString()));
         FileUtils.copyFile(pluginFile, new File(pluginPath.toString()));
