@@ -106,7 +106,7 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
             makeGradleContainerDeployable(configurationRequest, monitor);
             markTestAndProvidedDependenciesAsNonDeployable(configurationRequest, monitor);
             removeTestSourceSetLinks(configurationRequest, monitor);
-            printProjectDependencies(configurationRequest);
+            processProjectDependencies(configurationRequest, monitor);
         } catch (Exception e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
@@ -304,16 +304,13 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         // TODO: Mark projects as non deployable, but put references in component file
 
         IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
-        IClasspathContainer rootContainer = null;
         String projectPath = configurationRequest.getProjectPath();
 
-        rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        IClasspathContainer rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        List<IClasspathEntry> classpathEntries = Arrays.asList(rootContainer.getClasspathEntries());
+
         final List<OmniGradleDependency> compileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "compile");
         List<OmniGradleDependency> runtimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "runtime");
-        for (OmniGradleDependency dep : compileDependencies) {
-            System.out.println("Dep name" + dep.getName());
-        }
-        List<IClasspathEntry> classpathEntries = Arrays.asList(rootContainer.getClasspathEntries());
 
         List<OmniGradleDependency> testCompileDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testCompile");
         List<OmniGradleDependency> testRuntimeDependencies = ProjectAnalyzer.getDependenciesForConfiguration(projectPath, "testRuntime");
@@ -371,12 +368,69 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         JavaCore.setClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), new IJavaProject[] { javaProject }, new IClasspathContainer[] {classpathContainer}, monitor);
     }
 
-    private void printProjectDependencies(ProjectConfigurationRequest configurationRequest) {
+    private void processProjectDependencies(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) throws Exception {
         String projectPath = configurationRequest.getProjectPath();
-        final List<OmniGradleDependency> compileDependencies = ProjectAnalyzer.getProjectDependenciesForConfiguration(projectPath, "compile");
-        for (OmniGradleDependency i : compileDependencies) {
-            System.out.println("Project Dependency " + i.getName());
+        IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
+
+        IClasspathContainer rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
+        List<IClasspathEntry> classpathEntries = Arrays.asList(rootContainer.getClasspathEntries());
+
+        final List<OmniGradleDependency> compileProjectDependencies = ProjectAnalyzer.getProjectDependenciesForConfiguration(projectPath, "compile");
+        final List<OmniGradleDependency> runtimeProjectDependencies = ProjectAnalyzer.getProjectDependenciesForConfiguration(projectPath, "runtime");
+
+        List<IClasspathEntry> newEntries = FluentIterable.from(classpathEntries).transform(new Function<IClasspathEntry, IClasspathEntry>() {
+
+            @Override
+            public IClasspathEntry apply(IClasspathEntry entry) {
+                for (OmniGradleDependency dep : compileProjectDependencies) {
+                    if (entry.getPath().toString().contains(dep.getName())) {
+                        if (entry.getPath().toString().contains(dep.getName())) {
+                            return markAsNonDeployable(entry);
+                        }
+                    }
+                }
+
+                for (OmniGradleDependency dep : runtimeProjectDependencies) {
+                    if (entry.getPath().toString().contains(dep.getName())) {
+                        if (entry.getPath().toString().contains(dep.getName())) {
+                            return markAsNonDeployable(entry);
+                        }
+                    }
+                }
+
+                return entry;
+            }
+        }).toList();
+
+        IClasspathContainer classpathContainer = GradleClasspathContainer.newInstance(newEntries);
+        JavaCore.setClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), new IJavaProject[] { javaProject }, new IClasspathContainer[] {classpathContainer}, monitor);
+
+        IProject workspaceProject = configurationRequest.getWorkspaceProject();
+        IVirtualComponent component = ComponentCore.createComponent(workspaceProject);
+        IVirtualFolder jsrc = component.getRootFolder().getFolder("/");
+
+        System.out.println("HERE: " + projectPath);
+        System.out.println("JSRC: " + jsrc);
+
+        for (OmniGradleDependency dep : compileProjectDependencies) {
+            try {
+                System.out.println(dep);
+                jsrc.createLink(new Path("../" + dep.getName()), 0, monitor);
+            } catch (CoreException e) {
+                e.printStackTrace();
+                Activator.getLogger().error(e.getMessage(), e);
+            }
         }
+
+        for (OmniGradleDependency dep : runtimeProjectDependencies) {
+            try {
+                jsrc.createLink(new Path(dep.getName()), 0, monitor);
+            } catch (CoreException e) {
+                e.printStackTrace();
+                Activator.getLogger().error(e.getMessage(), e);
+            }
+        }
+
     }
 
 }

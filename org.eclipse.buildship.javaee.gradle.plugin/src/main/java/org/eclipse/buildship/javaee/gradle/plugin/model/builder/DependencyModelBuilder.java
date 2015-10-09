@@ -46,7 +46,6 @@ public class DependencyModelBuilder implements ToolingModelBuilder {
         List<OmniGradleDependency> providedCompileDependencies = getDependenciesForConfiguration(project, "providedCompile");
         List<OmniGradleDependency> providedRuntimeDependencies = getDependenciesForConfiguration(project, "providedRuntime");
 
-
         List<OmniGradleDependency> compileProjectDependencies = getProjectDependenciesForConfiguration(project, "compile");
         List<OmniGradleDependency> runtimeProjectDependencies = getProjectDependenciesForConfiguration(project, "runtime");
         List<OmniGradleDependency> testCompileProjectDependencies = getProjectDependenciesForConfiguration(project, "testCompile");
