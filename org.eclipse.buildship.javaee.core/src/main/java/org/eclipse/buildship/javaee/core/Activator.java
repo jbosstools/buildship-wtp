@@ -113,7 +113,7 @@ public class Activator extends Plugin {
         FileUtils.copyDirectory(repoFile, new File(repoPath.toString()));
     }
 
-    File getFile(Bundle bundle, String path) throws IOException {
+    private File getFile(Bundle bundle, String path) throws IOException {
         URL url = bundle.getEntry(path);
         URL fileUrl = FileLocator.toFileURL(url);
         File f;
