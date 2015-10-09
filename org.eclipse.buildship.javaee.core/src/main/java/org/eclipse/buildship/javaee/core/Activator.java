@@ -12,6 +12,7 @@
 package org.eclipse.buildship.javaee.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Dictionary;
@@ -101,36 +102,27 @@ public class Activator extends Plugin {
         IPath guavaPath = metadataPath.append("repo").append("guava-15.0.jar");
 
         Bundle bundle = Platform.getBundle(PLUGIN_ID);
-        URL initUrl = FileLocator.toFileURL(bundle.getEntry("init.gradle"));
-        URL pluginUrl = FileLocator.toFileURL(bundle.getEntry("/repo/libs/redhat-plugin-1.0.jar"));
-        URL repoUrl = FileLocator.toFileURL(bundle.getEntry("/repo/"));
-        URL guavaUrl = FileLocator.toFileURL(bundle.getEntry("/lib/guava-15.0.jar"));
-
-        getLogger().info("Init URL   : " + initUrl);
-        getLogger().info("Plug-in URL: " + pluginUrl);
-
-        File initFile;
-        File pluginFile;
-        File repoFile;
-        File guavaFile;
-
-        // Adapted from https://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html
-        try {
-            initFile = new File(initUrl.toURI());
-            pluginFile = new File(pluginUrl.toURI());
-            repoFile = new File(repoUrl.toURI());
-            guavaFile = new File(guavaUrl.toURI());
-        } catch(URISyntaxException e) {
-            initFile = new File(initUrl.getPath());
-            pluginFile = new File(pluginUrl.getPath());
-            repoFile = new File(repoUrl.getPath());
-            guavaFile = new File(guavaUrl.getPath());
-        }
+        File initFile = getFile(bundle, "init.gradle");
+        File pluginFile = getFile(bundle, "/repo/libs/redhat-plugin-1.0.jar");
+        File repoFile = getFile(bundle, "/repo/");
+        File guavaFile = getFile(bundle, "/lib/guava-15.0.jar");
 
         FileUtils.copyFile(initFile, new File(initGradlePath.toString()));
         FileUtils.copyFile(pluginFile, new File(pluginPath.toString()));
         FileUtils.copyFile(guavaFile, new File(guavaPath.toString()));
         FileUtils.copyDirectory(repoFile, new File(repoPath.toString()));
+    }
+
+    File getFile(Bundle bundle, String path) throws IOException {
+        URL url = bundle.getEntry(path);
+        URL fileUrl = FileLocator.toFileURL(url);
+        File f;
+        try {
+          f = new File(fileUrl.toURI());
+        } catch(URISyntaxException e) {
+          f = new File(fileUrl.getPath());
+        }
+        return f;
     }
 
 }
