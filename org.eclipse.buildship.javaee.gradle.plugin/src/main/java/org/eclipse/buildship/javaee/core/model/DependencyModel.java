@@ -14,11 +14,12 @@ package org.eclipse.buildship.javaee.core.model;
 import java.util.List;
 
 import org.eclipse.buildship.javaee.core.OmniGradleDependency;
+import org.eclipse.buildship.javaee.core.OmniGradleProjectDependency;
 
 /**
  * Used to interact with a project's dependencies.
  */
 public interface DependencyModel {
     List<OmniGradleDependency> getDependenciesForConfiguration(String configuration);
-    List<OmniGradleDependency> getProjectDependenciesForConfiguration(String configuration);
+    List<OmniGradleProjectDependency> getProjectDependenciesForConfiguration(String configuration);
 }

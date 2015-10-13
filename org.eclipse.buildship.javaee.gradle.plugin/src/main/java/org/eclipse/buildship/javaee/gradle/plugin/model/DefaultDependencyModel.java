@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.buildship.javaee.core.OmniGradleDependency;
+import org.eclipse.buildship.javaee.core.OmniGradleProjectDependency;
 
 /**
  * Implementation of the DependencyModel.
@@ -31,20 +32,20 @@ public class DefaultDependencyModel implements Serializable {
     private final List<OmniGradleDependency> providedCompileDependencies;
     private final List<OmniGradleDependency> providedRuntimeDependencies;
 
-    private final List<OmniGradleDependency> compileProjectDependencies;
-    private final List<OmniGradleDependency> runtimeProjectDependencies;
-    private final List<OmniGradleDependency> testCompileProjectDependencies;
-    private final List<OmniGradleDependency> testRuntimeProjectDependencies;
-    private final List<OmniGradleDependency> providedCompileProjectDependencies;
-    private final List<OmniGradleDependency> providedRuntimeProjectDependencies;
+    private final List<OmniGradleProjectDependency> compileProjectDependencies;
+    private final List<OmniGradleProjectDependency> runtimeProjectDependencies;
+    private final List<OmniGradleProjectDependency> testCompileProjectDependencies;
+    private final List<OmniGradleProjectDependency> testRuntimeProjectDependencies;
+    private final List<OmniGradleProjectDependency> providedCompileProjectDependencies;
+    private final List<OmniGradleProjectDependency> providedRuntimeProjectDependencies;
 
     public DefaultDependencyModel(
             List<OmniGradleDependency> compileDependencies, List<OmniGradleDependency> runtimeDependencies,
             List<OmniGradleDependency> testCompileDependencies, List<OmniGradleDependency> testRuntimeDependencies,
             List<OmniGradleDependency> providedCompileDependencies, List<OmniGradleDependency> providedRuntimeDependencies,
-            List<OmniGradleDependency> compileProjectDependencies, List<OmniGradleDependency> runtimeProjectDependencies,
-            List<OmniGradleDependency> testCompileProjectDependencies, List<OmniGradleDependency> testRuntimeProjectDependencies,
-            List<OmniGradleDependency> providedCompileProjectDependencies, List<OmniGradleDependency> providedRuntimeProjectDependencies) {
+            List<OmniGradleProjectDependency> compileProjectDependencies, List<OmniGradleProjectDependency> runtimeProjectDependencies,
+            List<OmniGradleProjectDependency> testCompileProjectDependencies, List<OmniGradleProjectDependency> testRuntimeProjectDependencies,
+            List<OmniGradleProjectDependency> providedCompileProjectDependencies, List<OmniGradleProjectDependency> providedRuntimeProjectDependencies) {
         this.compileDependencies = compileDependencies;
         this.runtimeDependencies = runtimeDependencies;
         this.testCompileDependencies = testCompileDependencies;
@@ -77,7 +78,7 @@ public class DefaultDependencyModel implements Serializable {
         return new ArrayList<OmniGradleDependency>();
     }
 
-    public List<OmniGradleDependency> getProjectDependenciesForConfiguration(String configuration) {
+    public List<OmniGradleProjectDependency> getProjectDependenciesForConfiguration(String configuration) {
         if (configuration == "compile") {
             return this.compileProjectDependencies;
         } else if (configuration == "runtime") {
@@ -91,6 +92,6 @@ public class DefaultDependencyModel implements Serializable {
         } else if (configuration == "providedRuntime") {
             return this.providedRuntimeProjectDependencies;
         }
-        return new ArrayList<OmniGradleDependency>();
+        return new ArrayList<OmniGradleProjectDependency>();
     }
 }

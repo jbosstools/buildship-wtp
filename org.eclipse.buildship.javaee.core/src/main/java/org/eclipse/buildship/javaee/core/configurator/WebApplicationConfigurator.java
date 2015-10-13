@@ -29,7 +29,10 @@ import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -53,6 +56,7 @@ import org.eclipse.jst.jee.util.internal.JavaEEQuickPeek;
 import org.eclipse.wst.common.componentcore.ComponentCore;
 import org.eclipse.wst.common.componentcore.resources.IVirtualComponent;
 import org.eclipse.wst.common.componentcore.resources.IVirtualFolder;
+import org.eclipse.wst.common.componentcore.resources.IVirtualReference;
 import org.eclipse.wst.common.frameworks.datamodel.DataModelFactory;
 import org.eclipse.wst.common.frameworks.datamodel.IDataModel;
 import org.eclipse.wst.common.project.facet.core.IFacetedProject;
@@ -65,6 +69,7 @@ import org.eclipse.buildship.core.configurator.IProjectConfigurator;
 import org.eclipse.buildship.core.workspace.GradleClasspathContainer;
 import org.eclipse.buildship.javaee.core.Activator;
 import org.eclipse.buildship.javaee.core.OmniGradleDependency;
+import org.eclipse.buildship.javaee.core.OmniGradleProjectDependency;
 import org.eclipse.buildship.javaee.core.ProjectAnalyzer;
 import org.eclipse.buildship.javaee.core.ResourceCleaner;
 import org.eclipse.buildship.javaee.core.model.SourceSetModel;
@@ -375,6 +380,10 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         JavaCore.setClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), new IJavaProject[] { javaProject }, new IClasspathContainer[] {classpathContainer}, monitor);
     }
 
+    /**
+     * Marks project classpath entries in the gradle classpath container as non-deployable, and creates references to the projects
+     * in the main project's component file.
+     */
     private void processProjectDependencies(ProjectConfigurationRequest configurationRequest, IProgressMonitor monitor) throws Exception {
         String projectPath = configurationRequest.getProjectPath();
         IJavaProject javaProject = JavaCore.create(configurationRequest.getWorkspaceProject());
@@ -382,24 +391,24 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         IClasspathContainer rootContainer = JavaCore.getClasspathContainer(new Path(GradleClasspathContainer.CONTAINER_ID), javaProject);
         List<IClasspathEntry> classpathEntries = Arrays.asList(rootContainer.getClasspathEntries());
 
-        final List<OmniGradleDependency> compileProjectDependencies = ProjectAnalyzer.getProjectDependenciesForConfiguration(projectPath, "compile");
-        final List<OmniGradleDependency> runtimeProjectDependencies = ProjectAnalyzer.getProjectDependenciesForConfiguration(projectPath, "runtime");
+        final List<OmniGradleProjectDependency> compileProjectDependencies = ProjectAnalyzer.getProjectDependenciesForConfiguration(projectPath, "compile");
+        final List<OmniGradleProjectDependency> runtimeProjectDependencies = ProjectAnalyzer.getProjectDependenciesForConfiguration(projectPath, "runtime");
 
         List<IClasspathEntry> newEntries = FluentIterable.from(classpathEntries).transform(new Function<IClasspathEntry, IClasspathEntry>() {
 
             @Override
             public IClasspathEntry apply(IClasspathEntry entry) {
-                for (OmniGradleDependency dep : compileProjectDependencies) {
-                    if (entry.getPath().toString().contains(dep.getName())) {
-                        if (entry.getPath().toString().contains(dep.getName())) {
+                for (OmniGradleProjectDependency dep : compileProjectDependencies) {
+                    if (entry.getPath().toString().contains(dep.getId())) {
+                        if (entry.getPath().toString().contains(dep.getId())) {
                             return markAsNonDeployable(entry);
                         }
                     }
                 }
 
-                for (OmniGradleDependency dep : runtimeProjectDependencies) {
-                    if (entry.getPath().toString().contains(dep.getName())) {
-                        if (entry.getPath().toString().contains(dep.getName())) {
+                for (OmniGradleProjectDependency dep : runtimeProjectDependencies) {
+                    if (entry.getPath().toString().contains(dep.getId())) {
+                        if (entry.getPath().toString().contains(dep.getId())) {
                             return markAsNonDeployable(entry);
                         }
                     }
@@ -414,29 +423,34 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
         IProject workspaceProject = configurationRequest.getWorkspaceProject();
         IVirtualComponent component = ComponentCore.createComponent(workspaceProject);
-        IVirtualFolder jsrc = component.getRootFolder().getFolder("/");
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
-        System.out.println("HERE: " + projectPath);
-        System.out.println("JSRC: " + jsrc);
+        Set<IVirtualReference> references = new LinkedHashSet<IVirtualReference>();
 
-        for (OmniGradleDependency dep : compileProjectDependencies) {
-            try {
-                System.out.println(dep);
-                jsrc.createLink(new Path("../" + dep.getName()), 0, monitor);
-            } catch (CoreException e) {
-                e.printStackTrace();
-                Activator.getLogger().error(e.getMessage(), e);
-            }
+        for (OmniGradleProjectDependency dep : runtimeProjectDependencies) {
+            IVirtualComponent depComponent = ComponentCore.createComponent(root.getProject(dep.getProjectPath()));
+            IVirtualReference reference = ComponentCore.createReference(component, depComponent);
+            IPath path = new Path("/WEB-INF/lib");
+            reference.setArchiveName(dep.getId());
+            reference.setRuntimePath(path);
+            references.add(reference);
         }
 
-        for (OmniGradleDependency dep : runtimeProjectDependencies) {
-            try {
-                jsrc.createLink(new Path(dep.getName()), 0, monitor);
-            } catch (CoreException e) {
-                e.printStackTrace();
-                Activator.getLogger().error(e.getMessage(), e);
-            }
+        for (OmniGradleProjectDependency dep : compileProjectDependencies) {
+            IVirtualComponent depComponent = ComponentCore.createComponent(root.getProject(dep.getProjectPath()));
+            IVirtualReference reference = ComponentCore.createReference(component, depComponent);
+            IPath path = new Path("/WEB-INF/lib");
+            reference.setArchiveName(dep.getId());
+            reference.setRuntimePath(path);
+            references.add(reference);
         }
+
+        IVirtualReference[] newRefs = references.toArray(new IVirtualReference[references.size()]);
+        IVirtualReference[] overlayRefs = component.getReferences();
+        IVirtualReference[] allRefs = new IVirtualReference[overlayRefs.length + newRefs.length];
+        System.arraycopy(newRefs, 0, allRefs, 0, newRefs.length);
+        System.arraycopy(overlayRefs, 0, allRefs, newRefs.length, overlayRefs.length);
+        component.setReferences(allRefs);
 
     }
 

@@ -132,7 +132,7 @@ public class ProjectAnalyzer {
         return dependencyModel.getDependenciesForConfiguration(configuration);
     }
 
-    public static List<OmniGradleDependency> getProjectDependenciesForConfiguration(String projectPath, String configuration) {
+    public static List<OmniGradleProjectDependency> getProjectDependenciesForConfiguration(String projectPath, String configuration) {
         DependencyModel dependencyModel = getDependencyModel(projectPath);
         return dependencyModel.getProjectDependenciesForConfiguration(configuration);
     }

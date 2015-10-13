@@ -19,10 +19,7 @@ import java.io.File;
  */
 public interface WarModel {
     boolean hasWarPlugin();
-
     File getWebAppDir();
-
     String getWebAppDirName();
-
     String getWebXmlName();
 }

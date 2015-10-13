@@ -12,19 +12,25 @@
 package org.eclipse.buildship.javaee.gradle.plugin.model.builder;
 
 import java.util.List;
+import java.util.Set;
 
-import org.gradle.api.DomainObjectSet;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
-import org.gradle.api.artifacts.ProjectDependency;
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
+import org.gradle.api.artifacts.result.ResolutionResult;
+import org.gradle.api.artifacts.result.ResolvedComponentResult;
+import org.gradle.api.specs.Spec;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
+import org.gradle.util.CollectionUtils;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 
 import org.eclipse.buildship.javaee.core.GradleDependency;
+import org.eclipse.buildship.javaee.core.GradleProjectDependency;
 import org.eclipse.buildship.javaee.core.OmniGradleDependency;
+import org.eclipse.buildship.javaee.core.OmniGradleProjectDependency;
 import org.eclipse.buildship.javaee.gradle.plugin.model.DefaultDependencyModel;
 
 /**
@@ -81,14 +87,23 @@ public class DependencyModelBuilder implements ToolingModelBuilder {
         }).toList();
     }
 
-    private List<OmniGradleDependency> getProjectDependenciesForConfiguration(Project project, String configuration) {
-        DomainObjectSet<ProjectDependency> dependencies = project.getConfigurations().getByName(configuration).getAllDependencies().withType(ProjectDependency.class);;
+    // Adopted from https://github.com/gradle/gradle/blob/release/subprojects/ide/src/main/java/org/gradle/plugins/ide/internal/resolver/DefaultIdeDependencyResolver.java#L51-L58
+    private List<OmniGradleProjectDependency> getProjectDependenciesForConfiguration(Project project, String configuration) {
 
-        return FluentIterable.from(dependencies).transform(new Function<Dependency, OmniGradleDependency>() {
+        ResolutionResult result = project.getConfigurations().getByName(configuration).getIncoming().getResolutionResult();
+        final Set<ResolvedComponentResult> projectComponents = CollectionUtils.filter(result.getAllComponents(), new Spec<ResolvedComponentResult>() {
+            @Override
+            public boolean isSatisfiedBy(ResolvedComponentResult element) {
+                return element.getId() instanceof ProjectComponentIdentifier;
+            }
+        });
+
+        return FluentIterable.from(projectComponents).transform(new Function<ResolvedComponentResult, OmniGradleProjectDependency>() {
 
             @Override
-            public OmniGradleDependency apply(Dependency dependency) {
-                return new GradleDependency(dependency.getName(), dependency.getGroup(), dependency.getVersion());
+            public OmniGradleProjectDependency apply(ResolvedComponentResult dependency) {
+                String projectPath = ((ProjectComponentIdentifier) dependency.getId()).getProjectPath();
+                return new GradleProjectDependency(dependency.getId().toString(), projectPath);
 
             }
         }).toList();
