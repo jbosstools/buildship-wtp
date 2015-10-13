@@ -13,6 +13,9 @@ package org.eclipse.buildship.javaee.core.model;
 
 import org.eclipse.buildship.javaee.core.OmniGradleSourceSet;
 
+/**
+ * Gradle source set model.
+ */
 public interface SourceSetModel {
     public OmniGradleSourceSet getSourceSets();
 }

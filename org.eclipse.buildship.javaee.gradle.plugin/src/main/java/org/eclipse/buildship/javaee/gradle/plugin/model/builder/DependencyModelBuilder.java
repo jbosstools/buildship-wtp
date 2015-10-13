@@ -52,12 +52,12 @@ public class DependencyModelBuilder implements ToolingModelBuilder {
         List<OmniGradleDependency> providedCompileDependencies = getDependenciesForConfiguration(project, "providedCompile");
         List<OmniGradleDependency> providedRuntimeDependencies = getDependenciesForConfiguration(project, "providedRuntime");
 
-        List<OmniGradleDependency> compileProjectDependencies = getProjectDependenciesForConfiguration(project, "compile");
-        List<OmniGradleDependency> runtimeProjectDependencies = getProjectDependenciesForConfiguration(project, "runtime");
-        List<OmniGradleDependency> testCompileProjectDependencies = getProjectDependenciesForConfiguration(project, "testCompile");
-        List<OmniGradleDependency> testRuntimeProjectDependencies = getProjectDependenciesForConfiguration(project, "testRuntime");
-        List<OmniGradleDependency> providedCompileProjectDependencies = getProjectDependenciesForConfiguration(project, "providedCompile");
-        List<OmniGradleDependency> providedRuntimeProjectDependencies = getProjectDependenciesForConfiguration(project, "providedRuntime");
+        List<OmniGradleProjectDependency> compileProjectDependencies = getProjectDependenciesForConfiguration(project, "compile");
+        List<OmniGradleProjectDependency> runtimeProjectDependencies = getProjectDependenciesForConfiguration(project, "runtime");
+        List<OmniGradleProjectDependency> testCompileProjectDependencies = getProjectDependenciesForConfiguration(project, "testCompile");
+        List<OmniGradleProjectDependency> testRuntimeProjectDependencies = getProjectDependenciesForConfiguration(project, "testRuntime");
+        List<OmniGradleProjectDependency> providedCompileProjectDependencies = getProjectDependenciesForConfiguration(project, "providedCompile");
+        List<OmniGradleProjectDependency> providedRuntimeProjectDependencies = getProjectDependenciesForConfiguration(project, "providedRuntime");
 
         return new DefaultDependencyModel(
                 compileDependencies,
