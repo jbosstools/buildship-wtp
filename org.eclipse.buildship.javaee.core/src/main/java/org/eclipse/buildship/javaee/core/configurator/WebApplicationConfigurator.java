@@ -20,15 +20,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.gradle.api.file.FileCollection;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
-import com.gradleware.tooling.toolingmodel.OmniEclipseSourceDirectory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
