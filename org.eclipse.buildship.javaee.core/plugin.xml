@@ -5,7 +5,7 @@
   <extension
        point="org.eclipse.buildship.core.projectconfigurators">
        <configurator
-            class="org.eclipse.buildship.javaee.core.configurator.WebApplicationConfigurator"/>
+            class="org.eclipse.buildship.wtp.core.configurator.WebApplicationConfigurator"/>
   </extension>
 
 </plugin>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.buildship.javaee.gradle.plugin</name>
+	<name>org.eclipse.buildship.wtp.gradle.plugin</name>
 	<comment>Project javaee.plugin created by Buildship.</comment>
 	<projects>
 	</projects>

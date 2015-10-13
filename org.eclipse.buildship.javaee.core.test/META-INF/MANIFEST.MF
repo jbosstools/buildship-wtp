@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Buildship-JavaEE Tests
-Bundle-SymbolicName: org.eclipse.buildship.javaee.core.test
+Bundle-SymbolicName: org.eclipse.buildship.wtp.core.test
 Bundle-Version: 1.0.0.qualifier
-Fragment-Host: org.eclipse.buildship.javaee.core
+Fragment-Host: org.eclipse.buildship.wtp.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit
 Bundle-ClassPath: .,
