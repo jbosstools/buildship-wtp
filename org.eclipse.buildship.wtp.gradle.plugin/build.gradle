@@ -1,0 +1,16 @@
+apply plugin: 'java'
+
+archivesBaseName = 'redhat-plugin'
+version = '1.0'
+buildDir = '../org.eclipse.buildship.wtp.core/repo'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile gradleApi()
+    testCompile 'junit:junit:4.12'
+    compile project(":org.eclipse.buildship.wtp.core")
+}

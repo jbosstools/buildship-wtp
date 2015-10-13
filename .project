@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>javaee</name>
+	<name>buildship-wtp</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -21,7 +21,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-javaee.core</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-wtp.core</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -30,7 +30,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-javaee.model</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-wtp.model</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -57,7 +57,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-javaee.feature</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-wtp.feature</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -66,7 +66,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-javaee.site</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-wtp.site</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -75,7 +75,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-javaee.plugin</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-wtp.plugin</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -84,7 +84,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.core</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.wtp.core</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -93,7 +93,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.feature</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.wtp.feature</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -102,7 +102,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.model</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.wtp.model</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -111,7 +111,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.plugin</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.wtp.plugin</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -120,7 +120,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.site</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.wtp.site</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -129,7 +129,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.gradle.plugin</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.wtp.gradle.plugin</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -138,7 +138,7 @@
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.javaee.core.test</arguments>
+				<arguments>1.0-projectRelativePath-matches-false-false-org.eclipse.buildship.wtp.core.test</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>

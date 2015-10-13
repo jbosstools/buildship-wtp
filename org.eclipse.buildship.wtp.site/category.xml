@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.buildship.wtp.feature_1.0.0.201508061642.jar" id="org.eclipse.buildship.wtp.feature" version="0.0.0">
+      <category name="Buildship-JavaEE"/>
+   </feature>
+   <category-def name="Buildship-JavaEE" label="Buildship: Eclipse Plug-ins for Gradle"/>
+</site>

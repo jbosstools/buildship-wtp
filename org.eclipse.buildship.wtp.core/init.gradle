@@ -1,0 +1,18 @@
+initscript {
+    repositories {
+        flatDir {
+            dirs getStartParameter().getSystemPropertiesArgs().get('pluginDirectory')
+        }
+    }
+
+    dependencies {
+        classpath name: 'redhat-plugin-1.0'    
+        classpath 'com.google.guava:guava:15.0'
+
+    }
+}
+
+allprojects {
+    println 'test'
+    apply plugin: org.eclipse.buildship.wtp.gradle.plugin.JavaEEPlugin
+}
