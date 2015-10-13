@@ -24,8 +24,6 @@ package org.eclipse.buildship.wtp.core;
 
 import java.io.Serializable;
 
-import org.eclipse.buildship.wtp.core.OmniGradleProjectDependency;
-
 /**
  * Bundles a Gradle Project Dependency such that it can be retrieved from the DependencyModel.
  */

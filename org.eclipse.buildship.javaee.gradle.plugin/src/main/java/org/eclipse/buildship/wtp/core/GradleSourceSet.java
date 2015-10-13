@@ -15,8 +15,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.eclipse.buildship.wtp.core.OmniGradleSourceSet;
-
 /**
  * Gets Gradle main and test source sets.
  */
