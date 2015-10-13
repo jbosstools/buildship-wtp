@@ -25,8 +25,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
-import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -101,8 +99,6 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
         System.out.println("Web App Project Configuration Starting");
 
         MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, "", null);
-        IProject workspaceProject = configurationRequest.getWorkspaceProject();
-        OmniEclipseProject project = configurationRequest.getProject();
         try {
             configureFacets(configurationRequest, monitor, multiStatus);
             makeGradleContainerDeployable(configurationRequest, monitor);
