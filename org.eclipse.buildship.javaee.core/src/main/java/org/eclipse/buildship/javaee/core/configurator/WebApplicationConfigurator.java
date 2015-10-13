@@ -244,6 +244,11 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
      */
     private IClasspathEntry markAsDeployable(IClasspathEntry entry) {
         IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute(IClasspathDependencyConstants.CLASSPATH_COMPONENT_DEPENDENCY, "/WEB-INF/lib");
+
+        if (Arrays.asList(entry.getExtraAttributes()).contains(newAttribute)) {
+            return entry;
+        }
+
         List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
         gradleContainerAttributes.add(newAttribute);
         return JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes
@@ -252,6 +257,11 @@ public class WebApplicationConfigurator implements IProjectConfigurator {
 
     private IClasspathEntry markAsNonDeployable(IClasspathEntry entry) {
         IClasspathAttribute newAttribute = JavaCore.newClasspathAttribute(IClasspathDependencyConstants.CLASSPATH_COMPONENT_NON_DEPENDENCY, "/WEB-INF/lib");
+
+        if (Arrays.asList(entry.getExtraAttributes()).contains(newAttribute)) {
+            return entry;
+        }
+
         List<IClasspathAttribute> gradleContainerAttributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
         gradleContainerAttributes.add(newAttribute);
         return JavaCore.newContainerEntry(entry.getPath(), entry.getAccessRules(), gradleContainerAttributes
